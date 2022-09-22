@@ -1,10 +1,3 @@
-/**
- * Shader.cpp
- * Contributors:
- *      * Arthur Sonzogni (author)
- * Licence:
- *      * MIT
- */
 
 #include "Shader.hpp"
 

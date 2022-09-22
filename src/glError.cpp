@@ -1,10 +1,3 @@
-/**
- * glError.cpp
- * Contributors:
- *      * Arthur Sonzogni (author)
- * Licence:
- *      * MIT
- */
 
 #include "glError.hpp"
 

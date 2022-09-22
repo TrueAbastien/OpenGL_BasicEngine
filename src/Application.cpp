@@ -1,10 +1,3 @@
-/**
- * Application.hpp
- * Contributors:
- *      * Arthur Sonzogni (author)
- * Licence:
- *      * MIT
- */
 
 #include "Application.hpp"
 

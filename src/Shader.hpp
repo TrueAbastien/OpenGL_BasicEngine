@@ -1,12 +1,5 @@
-/**
- * Shader.hpp
- * Contributors:
- *      * Arthur Sonzogni (author)
- * Licence:
- *      * MIT
- */
-#ifndef OPENGL_CMAKE_SKELETON_SHADER_HPP
-#define OPENGL_CMAKE_SKELETON_SHADER_HPP
+
+#pragma once
 
 #define GLM_FORCE_RADIANS
 #include <GL/glew.h>
@@ -91,5 +84,3 @@ class ShaderProgram {
 
   void link();
 };
-
-#endif  // OPENGL_CMAKE_SKELETON_SHADER_HPP
