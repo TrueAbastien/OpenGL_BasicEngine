@@ -12,8 +12,6 @@
 #include "asset.hpp"
 #include "glError.hpp"
 
-static double dt = 0.0;
-
 class PendulumComponent final : public Box
 {
 public:
@@ -26,17 +24,16 @@ public:
   }
 
 protected:
-  void beforeUpdate(Renderer* renderer,
-                    glm::mat4 worldToParent,
-                    glm::mat4 worldToLocal) override
+  void beforeUpdate(Renderer* renderer, UpdateData data) override
   {
-    previous.second -= root_angular_velocity * glm::sin(previous.first) * dt;
-    previous.first += previous.second * dt;
+    previous.second -= root_angular_velocity * glm::sin(previous.first) * data.dt;
+    previous.first += previous.second * data.dt;
 
     m_parentToLocal = glm::rotate((float)previous.first, glm::vec3(-1.0, 0.0, 0.0));
     m_parentToLocal = glm::translate(m_parentToLocal, glm::vec3(0.0, 0.0, -m_scale.z * 0.5));
 
-    Box::beforeUpdate(renderer, worldToParent, worldToParent * m_parentToLocal);
+    data.worldToLocal = data.worldToParent * m_parentToLocal;
+    Box::beforeUpdate(renderer, data);
   }
   
 private:
@@ -55,6 +52,13 @@ PendulumApplication::PendulumApplication()
 
   auto pendulum = std::make_shared<PendulumComponent>(9.81, 1.0, glm::pi<double>() / 5.0, 1.0);
   m_scene->addChild(pendulum);
+
+  auto transform = std::make_shared<EmptyTransform>();
+  transform->setLocalModel(glm::vec3(0.0, 0.0, -0.5));
+  pendulum->addChild(transform);
+
+  auto dummy = std::make_shared<PendulumComponent>(9.81, 1.0, glm::pi<double>() / 5.0, 1.0);
+  transform->addChild(dummy);
 
   m_renderer->start(m_scene.get());
 }
@@ -80,6 +84,8 @@ void PendulumApplication::loop() {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-  dt = (double)getFrameDeltaTime();
-  m_renderer->update(m_scene.get());
+  UpdateData data;
+  data.dt = (double) getFrameDeltaTime();
+  data.t = (double) getTime();
+  m_renderer->update(m_scene.get(), data);
 }

@@ -4,6 +4,7 @@
 #include "Shader.hpp"
 #include <memory>
 #include <vector>
+#include <optional>
 
 #include "glError.hpp"
 
@@ -15,6 +16,15 @@ struct VertexType {
   glm::vec3 position;
   glm::vec3 normal;
   glm::vec4 color;
+};
+
+// Update Data
+struct UpdateData
+{
+  glm::mat4 worldToParent;
+  glm::mat4 worldToLocal;
+  double dt;
+  double t;
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -41,11 +51,11 @@ class Component
 
 public:
   void initialize(Renderer* renderer);
-  void update(Renderer* renderer, glm::mat4 worldToLocal = glm::mat4());
+  void update(Renderer* renderer, UpdateData data);
 
 protected:
   virtual void beforeInitialize(Renderer* renderer) {}
-  virtual void beforeUpdate(Renderer* renderer, glm::mat4 worldToParent, glm::mat4 worldToLocal) {}
+  virtual void beforeUpdate(Renderer* renderer, UpdateData data) {}
 
 protected:
   Component() = default;
@@ -76,8 +86,8 @@ protected:
   Renderable();
 
 protected:
-  void initializeRenderable(std::vector<VertexType> vertices, std::vector<GLuint> index);
-  void updateRenderable(Renderer* renderer, glm::mat4 worldToLocal, GLsizei count);
+  virtual void initializeRenderable(std::vector<VertexType> vertices, std::vector<GLuint> index);
+  virtual void updateRenderable(Renderer* renderer, glm::mat4 worldToLocal, GLsizei nFaces);
 
 protected:
   // shader
@@ -90,6 +100,23 @@ protected:
 };
 
 // ------------------------------------------------------------------------------------------------
+class Meshable : public Renderable
+{
+protected:
+  Meshable();
+
+protected:
+  void initializeRenderable(std::vector<VertexType> vertices, std::vector<GLuint> index) override;
+
+public:
+  void updateMesh();
+
+protected:
+  std::vector<VertexType> m_vertices;
+  std::vector<GLuint> m_indexes;
+};
+
+// ------------------------------------------------------------------------------------------------
 class Box : public Renderable
 {
 public:
@@ -97,9 +124,7 @@ public:
 
 protected:
   void beforeInitialize(Renderer* renderer) override;
-  void beforeUpdate(Renderer* renderer,
-                    glm::mat4 worldToParent,
-                    glm::mat4 worldToLocal) override;
+  void beforeUpdate(Renderer* renderer, UpdateData data) override;
 
 protected:
   glm::vec3 m_scale;

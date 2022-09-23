@@ -17,9 +17,9 @@ void Renderer::start(Component* scene)
 }
 
 // ------------------------------------------------------------------------------------------------
-void Renderer::update(Component* scene)
+void Renderer::update(Component* scene, UpdateData data)
 {
-  scene->update(this);
+  scene->update(this, data);
 }
 
 // ------------------------------------------------------------------------------------------------

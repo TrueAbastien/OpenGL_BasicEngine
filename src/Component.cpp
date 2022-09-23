@@ -100,15 +100,16 @@ void Component::initialize(Renderer* renderer)
 }
 
 // ------------------------------------------------------------------------------------------------
-void Component::update(Renderer* renderer, glm::mat4 worldToLocal)
+void Component::update(Renderer* renderer, UpdateData data)
 {
-  glm::mat4 worldToChild = worldToLocal * m_parentToLocal;
+  data.worldToParent = data.worldToLocal;
+  data.worldToLocal *= m_parentToLocal;
 
-  beforeUpdate(renderer, worldToLocal, worldToChild);
+  beforeUpdate(renderer, data);
 
   for (auto& child : m_children)
   {
-    child->update(renderer, worldToChild);
+    child->update(renderer, data);
   }
 }
 
@@ -167,7 +168,7 @@ void Renderable::initializeRenderable(std::vector<VertexType> vertices,
 }
 
 // ------------------------------------------------------------------------------------------------
-void Renderable::updateRenderable(Renderer* renderer, glm::mat4 worldToLocal, GLsizei count)
+void Renderable::updateRenderable(Renderer* renderer, glm::mat4 worldToLocal, GLsizei nFaces)
 {
   shaderProgram.use();
 
@@ -184,7 +185,7 @@ void Renderable::updateRenderable(Renderer* renderer, glm::mat4 worldToLocal, GL
 
   glCheckError(__FILE__, __LINE__);
   glDrawElements(GL_TRIANGLES,     // mode
-                 count,            // count
+                 nFaces * 3,       // count
                  GL_UNSIGNED_INT,  // type
                  NULL              // element array buffer offset
   );
@@ -192,6 +193,33 @@ void Renderable::updateRenderable(Renderer* renderer, glm::mat4 worldToLocal, GL
   glBindVertexArray(0);
 
   shaderProgram.unuse();
+}
+
+// ------------------------------------------------------------------------------------------------
+Meshable::Meshable()
+  : m_vertices(0),
+    m_indexes(0)
+{
+}
+
+// ------------------------------------------------------------------------------------------------
+void Meshable::initializeRenderable(std::vector<VertexType> vertices, std::vector<GLuint> index)
+{
+  m_vertices = std::move(vertices);
+  m_indexes = std::move(index);
+
+  Meshable::updateMesh();
+}
+
+// ------------------------------------------------------------------------------------------------
+void Meshable::updateMesh()
+{
+  if (m_vertices.empty() || m_indexes.empty())
+  {
+    return;
+  }
+
+  Renderable::initializeRenderable(m_vertices, m_indexes);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -249,10 +277,9 @@ void Box::beforeInitialize(Renderer* renderer)
 }
 
 // ------------------------------------------------------------------------------------------------
-void Box::beforeUpdate(Renderer* renderer, glm::mat4 /*worldToParent*/, glm::mat4 worldToLocal)
+void Box::beforeUpdate(Renderer* renderer, UpdateData data)
 {
-  Renderable::updateRenderable(renderer, worldToLocal,
+  Renderable::updateRenderable(renderer, data.worldToLocal,
                                6 * // Face on Cube
-                               2 * // Triangle per Face
-                               3); // Vector Size
+                               2); // Triangle per Face
 }

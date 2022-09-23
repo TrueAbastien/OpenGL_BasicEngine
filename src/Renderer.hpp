@@ -11,7 +11,7 @@ public:
 
 public:
   void start(Component* scene);
-  void update(Component* scene);
+  void update(Component* scene, UpdateData data);
 
   glm::mat4 getProjection() const;
   glm::mat4 getView() const;
