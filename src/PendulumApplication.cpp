@@ -24,7 +24,7 @@ public:
   }
 
 protected:
-  void beforeUpdate(Renderer* renderer, UpdateData data) override
+  void beforeUpdate(Renderer* renderer, UpdateData& data) override
   {
     previous.second -= root_angular_velocity * glm::sin(previous.first) * data.dt;
     previous.first += previous.second * data.dt;

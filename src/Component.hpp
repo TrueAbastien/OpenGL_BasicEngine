@@ -51,11 +51,11 @@ class Component
 
 public:
   void initialize(Renderer* renderer);
-  void update(Renderer* renderer, UpdateData data);
+  void update(Renderer* renderer, UpdateData& data);
 
 protected:
   virtual void beforeInitialize(Renderer* renderer) {}
-  virtual void beforeUpdate(Renderer* renderer, UpdateData data) {}
+  virtual void beforeUpdate(Renderer* renderer, UpdateData& data) {}
 
 protected:
   Component() = default;
@@ -124,8 +124,27 @@ public:
 
 protected:
   void beforeInitialize(Renderer* renderer) override;
-  void beforeUpdate(Renderer* renderer, UpdateData data) override;
+  void beforeUpdate(Renderer* renderer, UpdateData& data) override;
 
 protected:
   glm::vec3 m_scale;
+};
+
+// ------------------------------------------------------------------------------------------------
+class RigidBody final : public Component
+{
+public:
+  RigidBody(const std::shared_ptr<Renderable>& target);
+
+private:
+  void beforeUpdate(Renderer* renderer, UpdateData& data) override;
+
+  void updateTransform();
+
+private:
+  glm::vec3 m_angular_velocity;
+  glm::vec3 m_velocity;
+
+  glm::vec3 m_previous_local_position;
+  glm::vec3 m_previous_local_rotation;
 };

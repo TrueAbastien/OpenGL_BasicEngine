@@ -100,7 +100,7 @@ void Component::initialize(Renderer* renderer)
 }
 
 // ------------------------------------------------------------------------------------------------
-void Component::update(Renderer* renderer, UpdateData data)
+void Component::update(Renderer* renderer, UpdateData& data)
 {
   data.worldToParent = data.worldToLocal;
   data.worldToLocal *= m_parentToLocal;
@@ -277,9 +277,35 @@ void Box::beforeInitialize(Renderer* renderer)
 }
 
 // ------------------------------------------------------------------------------------------------
-void Box::beforeUpdate(Renderer* renderer, UpdateData data)
+void Box::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
   Renderable::updateRenderable(renderer, data.worldToLocal,
                                6 * // Face on Cube
                                2); // Triangle per Face
+}
+
+// ------------------------------------------------------------------------------------------------
+RigidBody::RigidBody(const std::shared_ptr<Renderable>& target)
+{
+  if (target == nullptr)
+  {
+    return;
+  }
+
+  addChild(target);
+}
+
+// ------------------------------------------------------------------------------------------------
+void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
+{
+  // TODO
+
+  updateTransform();
+  data.worldToLocal = data.worldToParent * m_parentToLocal;
+}
+
+// ------------------------------------------------------------------------------------------------
+void RigidBody::updateTransform()
+{
+  setLocalModel(m_previous_local_position, m_previous_local_rotation);
 }
