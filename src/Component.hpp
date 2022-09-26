@@ -5,6 +5,8 @@
 #include <memory>
 #include <vector>
 #include <optional>
+#include <concepts>
+#include <iostream>
 
 #include "glError.hpp"
 
@@ -131,10 +133,45 @@ protected:
 };
 
 // ------------------------------------------------------------------------------------------------
+template <typename T>
+concept RenderableConcept = std::derived_from<T, Renderable>;
+
+namespace RigidBodyUtilities
+{
+  template <RenderableConcept T>
+  glm::mat3x3 inertiaMoment(const std::shared_ptr<T>& target)
+  {
+    std::cout << "Unspecified for this Renderable, try to specify it in RigidBodyUtilities." << std::endl;
+
+    assert(0);
+    return {};
+  }
+
+  // ------------------------------------------------------------------------------------------------
+  template <>
+  glm::mat3x3 inertiaMoment<Box>(const std::shared_ptr<Box>& target)
+  {
+    // TODO
+    return glm::mat3x3();
+  }
+}
+
 class RigidBody final : public Component
 {
 public:
-  RigidBody(const std::shared_ptr<Renderable>& target);
+  template <RenderableConcept T>
+  RigidBody(const std::shared_ptr<T>& target)
+  {
+    if (target == nullptr)
+    {
+      return;
+    }
+
+    addChild(target);
+
+    m_IBody = RigidBodyUtilities::inertiaMoment(target);
+    m_invIBody = glm::inverse(m_IBody);
+  }
 
 private:
   void beforeUpdate(Renderer* renderer, UpdateData& data) override;
@@ -143,8 +180,16 @@ private:
 
 private:
   glm::vec3 m_angular_velocity;
-  glm::vec3 m_velocity;
+  glm::vec3 m_linear_velocity;
 
-  glm::vec3 m_previous_local_position;
-  glm::vec3 m_previous_local_rotation;
+  glm::vec3 m_position;
+  glm::mat3x3 m_rotation;
+
+  double m_mass;
+
+  glm::vec3 m_force;
+  glm::vec3 m_torque;
+
+  glm::mat3x3 m_IBody;
+  glm::mat3x3 m_invIBody;
 };

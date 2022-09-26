@@ -285,19 +285,13 @@ void Box::beforeUpdate(Renderer* renderer, UpdateData& data)
 }
 
 // ------------------------------------------------------------------------------------------------
-RigidBody::RigidBody(const std::shared_ptr<Renderable>& target)
-{
-  if (target == nullptr)
-  {
-    return;
-  }
-
-  addChild(target);
-}
-
-// ------------------------------------------------------------------------------------------------
 void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
+  // Position
+  m_linear_velocity += m_force * (float) (data.dt / m_mass);
+  m_position += m_linear_velocity * (float) data.dt;
+
+  // Rotation
   // TODO
 
   updateTransform();
@@ -307,5 +301,8 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
 // ------------------------------------------------------------------------------------------------
 void RigidBody::updateTransform()
 {
-  setLocalModel(m_previous_local_position, m_previous_local_rotation);
+  glm::mat4x4 mat = {
+    m_rotation[0,1], 
+  }
+  setLocalModel(m_position, m_rotation);
 }
