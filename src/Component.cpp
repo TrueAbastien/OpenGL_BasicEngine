@@ -226,6 +226,12 @@ void Meshable::updateMesh()
 Box::Box(glm::vec3 scale) : Renderable(), m_scale(scale) {}
 
 // ------------------------------------------------------------------------------------------------
+glm::vec3 Box::scale() const
+{
+  m_scale;
+}
+
+// ------------------------------------------------------------------------------------------------
 void Box::beforeInitialize(Renderer* renderer)
 {
   // creation of the mesh ------------------------------------------------------
@@ -301,8 +307,8 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
 // ------------------------------------------------------------------------------------------------
 void RigidBody::updateTransform()
 {
-  glm::mat4x4 mat = {
-    m_rotation[0,1], 
-  }
-  setLocalModel(m_position, m_rotation);
+  glm::mat4x4 mat(m_rotation);
+  glm::translate(mat, m_position);
+
+  setLocalModel(mat);
 }

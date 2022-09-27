@@ -124,6 +124,8 @@ class Box : public Renderable
 public:
   Box(glm::vec3 scale);
 
+  glm::vec3 scale() const;
+
 protected:
   void beforeInitialize(Renderer* renderer) override;
   void beforeUpdate(Renderer* renderer, UpdateData& data) override;
@@ -136,28 +138,27 @@ protected:
 template <typename T>
 concept RenderableConcept = std::derived_from<T, Renderable>;
 
+// Forward Declaration
+class RigidBody;
+
 namespace RigidBodyUtilities
 {
   template <RenderableConcept T>
-  glm::mat3x3 inertiaMoment(const std::shared_ptr<T>& target)
+  glm::mat3x3 inertiaMoment(RigidBody* rigidBody, const std::shared_ptr<T>& target)
   {
-    std::cout << "Unspecified for this Renderable, try to specify it in RigidBodyUtilities." << std::endl;
+    std::cout << "[Error!] Unspecified for this Renderable, try to specify it in RigidBodyUtilities." << std::endl;
 
     assert(0);
     return {};
-  }
-
-  // ------------------------------------------------------------------------------------------------
-  template <>
-  glm::mat3x3 inertiaMoment<Box>(const std::shared_ptr<Box>& target)
-  {
-    // TODO
-    return glm::mat3x3();
   }
 }
 
 class RigidBody final : public Component
 {
+public:
+  template <RenderableConcept T>
+  friend glm::mat3x3 RigidBodyUtilities::inertiaMoment(RigidBody* rigidBody, const std::shared_ptr<T>& target);
+
 public:
   template <RenderableConcept T>
   RigidBody(const std::shared_ptr<T>& target)
@@ -178,7 +179,7 @@ private:
 
   void updateTransform();
 
-private:
+protected:
   glm::vec3 m_angular_velocity;
   glm::vec3 m_linear_velocity;
 
@@ -193,3 +194,15 @@ private:
   glm::mat3x3 m_IBody;
   glm::mat3x3 m_invIBody;
 };
+
+namespace RigidBodyUtilities
+{
+  template <>
+  glm::mat3x3 inertiaMoment<Box>(RigidBody* rigidBody, const std::shared_ptr<Box>& target)
+  {
+    glm::vec3 s = target->scale() * target->scale();
+    glm::vec3 vec(s.y + s.z, s.z + s.x, s.x + s.y);
+    vec *= (float) rigidBody->m_mass / 12.0f;
+    return glm::mat3x3(vec.x, 0.0, 0.0, 0.0, vec.y, 0.0, 0.0, 0.0, vec.z);
+  }
+}
