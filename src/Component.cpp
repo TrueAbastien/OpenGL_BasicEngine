@@ -10,6 +10,7 @@
 
 #include <algorithm>
 #include <iostream>
+#include <numeric>
 
 
 // ------------------------------------------------------------------------------------------------
@@ -228,7 +229,7 @@ Box::Box(glm::vec3 scale) : Renderable(), m_scale(scale) {}
 // ------------------------------------------------------------------------------------------------
 glm::vec3 Box::scale() const
 {
-  m_scale;
+  return m_scale;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -291,6 +292,47 @@ void Box::beforeUpdate(Renderer* renderer, UpdateData& data)
 }
 
 // ------------------------------------------------------------------------------------------------
+size_t RigidBody::addForce(const ExternalForce& force)
+{
+  m_external_forces.push_back(force);
+  computeForceTorque();
+
+  return m_external_forces.size();
+}
+
+// ------------------------------------------------------------------------------------------------
+bool RigidBody::removeForce(size_t index)
+{
+  if (index >= m_external_forces.size())
+  {
+    return false;
+  }
+
+  m_external_forces.erase(m_external_forces.begin() + index);
+  computeForceTorque();
+
+  return true;
+}
+
+// ------------------------------------------------------------------------------------------------
+bool RigidBody::setMass(double mass)
+{
+  if (mass <= 0.0)
+  {
+    return false;
+  }
+
+  m_mass = mass;
+  return true;
+}
+
+// ------------------------------------------------------------------------------------------------
+double RigidBody::getMass() const
+{
+  return m_mass;
+}
+
+// ------------------------------------------------------------------------------------------------
 void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
   // Position
@@ -298,7 +340,17 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
   m_position += m_linear_velocity * (float) data.dt;
 
   // Rotation
-  // TODO
+  glm::mat3 Rt = glm::transpose(m_rotation);
+  glm::mat3 invI = m_rotation * m_invIBody * Rt;
+  glm::vec3 angular_velocity = invI * m_torque;
+  // ---
+  auto starMatrix = [](const glm::vec3& v) -> glm::mat3
+  {
+    return glm::mat3(0.0, -v.z, v.y, v.z, 0.0, -v.x, -v.y, v.x, 0.0);
+  };
+  m_derived_rotation = starMatrix(angular_velocity) * m_rotation;
+  // ---
+  m_rotation += m_derived_rotation * (float) data.dt; // TODO ?
 
   updateTransform();
   data.worldToLocal = data.worldToParent * m_parentToLocal;
@@ -311,4 +363,20 @@ void RigidBody::updateTransform()
   glm::translate(mat, m_position);
 
   setLocalModel(mat);
+}
+
+// ------------------------------------------------------------------------------------------------
+void RigidBody::computeForceTorque()
+{
+  auto forceAcc = [](glm::vec3 r, ExternalForce f)
+  {
+    return r + f.force;
+  };
+  m_force = std::accumulate(m_external_forces.begin(), m_external_forces.end(), glm::vec3(0.0f), forceAcc);
+
+  auto torqueAcc = [](glm::vec3 r, ExternalForce f)
+  {
+    return r + glm::cross(f.position, f.force);
+  };
+  m_torque = std::accumulate(m_external_forces.begin(), m_external_forces.end(), glm::vec3(0.0f), torqueAcc);
 }

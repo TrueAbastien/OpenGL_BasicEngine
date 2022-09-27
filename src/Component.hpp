@@ -144,7 +144,7 @@ class RigidBody;
 namespace RigidBodyUtilities
 {
   template <RenderableConcept T>
-  glm::mat3x3 inertiaMoment(RigidBody* rigidBody, const std::shared_ptr<T>& target)
+  inline glm::mat3 inertiaMoment(RigidBody* rigidBody, const std::shared_ptr<T>& target)
   {
     std::cout << "[Error!] Unspecified for this Renderable, try to specify it in RigidBodyUtilities." << std::endl;
 
@@ -159,6 +159,12 @@ public:
   template <RenderableConcept T>
   friend glm::mat3x3 RigidBodyUtilities::inertiaMoment(RigidBody* rigidBody, const std::shared_ptr<T>& target);
 
+  struct ExternalForce
+  {
+    glm::vec3 position;
+    glm::vec3 force;
+  };
+
 public:
   template <RenderableConcept T>
   RigidBody(const std::shared_ptr<T>& target)
@@ -170,39 +176,48 @@ public:
 
     addChild(target);
 
-    m_IBody = RigidBodyUtilities::inertiaMoment(target);
-    m_invIBody = glm::inverse(m_IBody);
+    // Compute Inertia Moment Matrix
+    m_invIBody = glm::inverse(RigidBodyUtilities::inertiaMoment(target));
   }
+
+  // Returns the current amount of External Forces
+  size_t addForce(const ExternalForce& force);
+  bool removeForce(size_t index);
+
+  bool setMass(double mass);
+  double getMass() const;
 
 private:
   void beforeUpdate(Renderer* renderer, UpdateData& data) override;
 
   void updateTransform();
+  void computeForceTorque();
 
 protected:
-  glm::vec3 m_angular_velocity;
   glm::vec3 m_linear_velocity;
+  glm::mat3 m_derived_rotation;
+
+  glm::mat3 m_invIBody;
 
   glm::vec3 m_position;
-  glm::mat3x3 m_rotation;
+  glm::mat3 m_rotation;
 
   double m_mass;
 
+  std::vector<ExternalForce> m_external_forces;
+
   glm::vec3 m_force;
   glm::vec3 m_torque;
-
-  glm::mat3x3 m_IBody;
-  glm::mat3x3 m_invIBody;
 };
 
 namespace RigidBodyUtilities
 {
   template <>
-  glm::mat3x3 inertiaMoment<Box>(RigidBody* rigidBody, const std::shared_ptr<Box>& target)
+  inline glm::mat3 inertiaMoment<Box>(RigidBody* rigidBody, const std::shared_ptr<Box>& target)
   {
     glm::vec3 s = target->scale() * target->scale();
     glm::vec3 vec(s.y + s.z, s.z + s.x, s.x + s.y);
     vec *= (float) rigidBody->m_mass / 12.0f;
-    return glm::mat3x3(vec.x, 0.0, 0.0, 0.0, vec.y, 0.0, 0.0, 0.0, vec.z);
+    return glm::mat3(vec.x, 0.0, 0.0, 0.0, vec.y, 0.0, 0.0, 0.0, vec.z);
   }
 }
