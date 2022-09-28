@@ -213,6 +213,18 @@ void Meshable::initializeRenderable(std::vector<VertexType> vertices, std::vecto
 }
 
 // ------------------------------------------------------------------------------------------------
+std::vector<VertexType> Meshable::getVertices() const
+{
+  return m_vertices;
+}
+
+// ------------------------------------------------------------------------------------------------
+std::vector<GLuint> Meshable::getIndexes() const
+{
+  return m_indexes;
+}
+
+// ------------------------------------------------------------------------------------------------
 void Meshable::updateMesh()
 {
   if (m_vertices.empty() || m_indexes.empty())
@@ -224,10 +236,10 @@ void Meshable::updateMesh()
 }
 
 // ------------------------------------------------------------------------------------------------
-Box::Box(glm::vec3 scale) : Renderable(), m_scale(scale) {}
+Box::Box(glm::vec3 scale) : Meshable(), m_scale(scale) {}
 
 // ------------------------------------------------------------------------------------------------
-glm::vec3 Box::scale() const
+glm::vec3 Box::getScale() const
 {
   return m_scale;
 }
@@ -280,15 +292,30 @@ void Box::beforeInitialize(Renderer* renderer)
   index.push_back(7); index.push_back(5); index.push_back(4);  // H, F, E
   index.push_back(7); index.push_back(4); index.push_back(6);  // H, E, G
 
-  Renderable::initializeRenderable(vertices, index);
+  Meshable::initializeRenderable(vertices, index);
 }
 
 // ------------------------------------------------------------------------------------------------
 void Box::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
-  Renderable::updateRenderable(renderer, data.worldToLocal,
-                               6 * // Face on Cube
-                               2); // Triangle per Face
+  Meshable::updateRenderable(renderer, data.worldToLocal,
+                             6 * // Face on Cube
+                             2); // Triangle per Face
+}
+
+// ------------------------------------------------------------------------------------------------
+RigidBody::RigidBody(const std::shared_ptr<Meshable>& target, double mass)
+  : m_target(target), m_mass(mass)
+{
+  if (target == nullptr)
+  {
+    return;
+  }
+
+  addChild(target);
+
+  // Compute Inertia Moment Matrix
+  computeInertia();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -323,6 +350,8 @@ bool RigidBody::setMass(double mass)
   }
 
   m_mass = mass;
+  computeInertia();
+
   return true;
 }
 
@@ -379,4 +408,20 @@ void RigidBody::computeForceTorque()
     return r + glm::cross(f.position, f.force);
   };
   m_torque = std::accumulate(m_external_forces.begin(), m_external_forces.end(), glm::vec3(0.0f), torqueAcc);
+}
+
+// ------------------------------------------------------------------------------------------------
+void RigidBody::computeInertia()
+{
+  auto vertices = m_target->getVertices();
+  float pmass = (float) m_mass / vertices.size();
+
+  glm::mat3 body_inertia(0.0f);
+  for (const auto& vertex : vertices)
+  {
+    glm::mat3 m = glm::outerProduct(vertex.position, vertex.position);
+    body_inertia += glm::dot(vertex.position, vertex.position) * glm::mat3() - m;
+  }
+
+  m_invIBody = glm::inverse(body_inertia * pmass);
 }

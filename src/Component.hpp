@@ -113,18 +113,21 @@ protected:
 public:
   void updateMesh();
 
+  std::vector<VertexType> getVertices() const;
+  std::vector<GLuint> getIndexes() const;
+
 protected:
   std::vector<VertexType> m_vertices;
   std::vector<GLuint> m_indexes;
 };
 
 // ------------------------------------------------------------------------------------------------
-class Box : public Renderable
+class Box : public Meshable
 {
 public:
   Box(glm::vec3 scale);
 
-  glm::vec3 scale() const;
+  glm::vec3 getScale() const;
 
 protected:
   void beforeInitialize(Renderer* renderer) override;
@@ -135,30 +138,9 @@ protected:
 };
 
 // ------------------------------------------------------------------------------------------------
-template <typename T>
-concept RenderableConcept = std::derived_from<T, Renderable>;
-
-// Forward Declaration
-class RigidBody;
-
-namespace RigidBodyUtilities
-{
-  template <RenderableConcept T>
-  inline glm::mat3 inertiaMoment(RigidBody* rigidBody, const std::shared_ptr<T>& target)
-  {
-    std::cout << "[Error!] Unspecified for this Renderable, try to specify it in RigidBodyUtilities." << std::endl;
-
-    assert(0);
-    return {};
-  }
-}
-
 class RigidBody final : public Component
 {
 public:
-  template <RenderableConcept T>
-  friend glm::mat3x3 RigidBodyUtilities::inertiaMoment(RigidBody* rigidBody, const std::shared_ptr<T>& target);
-
   struct ExternalForce
   {
     glm::vec3 position;
@@ -166,19 +148,7 @@ public:
   };
 
 public:
-  template <RenderableConcept T>
-  RigidBody(const std::shared_ptr<T>& target)
-  {
-    if (target == nullptr)
-    {
-      return;
-    }
-
-    addChild(target);
-
-    // Compute Inertia Moment Matrix
-    m_invIBody = glm::inverse(RigidBodyUtilities::inertiaMoment(target));
-  }
+  RigidBody(const std::shared_ptr<Meshable>& target, double mass = 1.0);
 
   // Returns the current amount of External Forces
   size_t addForce(const ExternalForce& force);
@@ -192,8 +162,11 @@ private:
 
   void updateTransform();
   void computeForceTorque();
+  void computeInertia();
 
 protected:
+  std::shared_ptr<Meshable> m_target;
+
   glm::vec3 m_linear_velocity;
   glm::mat3 m_derived_rotation;
 
@@ -209,15 +182,3 @@ protected:
   glm::vec3 m_force;
   glm::vec3 m_torque;
 };
-
-namespace RigidBodyUtilities
-{
-  template <>
-  inline glm::mat3 inertiaMoment<Box>(RigidBody* rigidBody, const std::shared_ptr<Box>& target)
-  {
-    glm::vec3 s = target->scale() * target->scale();
-    glm::vec3 vec(s.y + s.z, s.z + s.x, s.x + s.y);
-    vec *= (float) rigidBody->m_mass / 12.0f;
-    return glm::mat3(vec.x, 0.0, 0.0, 0.0, vec.y, 0.0, 0.0, 0.0, vec.z);
-  }
-}
