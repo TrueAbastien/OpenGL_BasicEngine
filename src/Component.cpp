@@ -305,7 +305,10 @@ void Box::beforeUpdate(Renderer* renderer, UpdateData& data)
 
 // ------------------------------------------------------------------------------------------------
 RigidBody::RigidBody(const std::shared_ptr<Meshable>& target, double mass)
-  : m_target(target), m_mass(mass)
+  : m_target(target), m_mass(mass),
+  m_position(glm::vec3(0.0)), m_rotation(glm::mat3(1.0)),
+  m_linear_velocity(glm::vec3(0.0)), m_derived_rotation(glm::mat3(0.0)),
+  m_force(glm::vec3(0.0)), m_torque(glm::vec3(0.0))
 {
   if (target == nullptr)
   {
@@ -314,7 +317,8 @@ RigidBody::RigidBody(const std::shared_ptr<Meshable>& target, double mass)
 
   addChild(target);
 
-  // Compute Inertia Moment Matrix
+  // Compute Inertia Matrix
+  target->initialize(nullptr);
   computeInertia();
 }
 
@@ -389,7 +393,7 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
 void RigidBody::updateTransform()
 {
   glm::mat4x4 mat(m_rotation);
-  glm::translate(mat, m_position);
+  mat = glm::translate(mat, m_position);
 
   setLocalModel(mat);
 }

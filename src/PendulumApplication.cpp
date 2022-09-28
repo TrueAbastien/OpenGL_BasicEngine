@@ -50,15 +50,32 @@ PendulumApplication::PendulumApplication()
 {
   glCheckError(__FILE__, __LINE__);
 
-  auto pendulum = std::make_shared<PendulumComponent>(9.81, 1.0, glm::pi<double>() / 5.0, 1.0);
-  m_scene->addChild(pendulum);
+  // Pendulum
+  /*{
+    auto pendulum = std::make_shared<PendulumComponent>(9.81, 1.0, glm::pi<double>() / 5.0, 1.0);
+    m_scene->addChild(pendulum);
 
-  auto transform = std::make_shared<EmptyTransform>();
-  transform->setLocalModel(glm::vec3(0.0, 0.0, -0.5));
-  pendulum->addChild(transform);
+    auto transform = std::make_shared<EmptyTransform>();
+    transform->setLocalModel(glm::vec3(0.0, 0.0, -0.5));
+    pendulum->addChild(transform);
 
-  auto dummy = std::make_shared<PendulumComponent>(9.81, 1.0, glm::pi<double>() / 5.0, 1.0);
-  transform->addChild(dummy);
+    auto dummy = std::make_shared<PendulumComponent>(9.81, 1.0, glm::pi<double>() / 5.0, 1.0);
+    transform->addChild(dummy);
+  }*/
+
+  // RigidBody
+  {
+    auto box = std::make_shared<Box>(glm::vec3(0.1f, 0.1f, 1.0f));
+    auto rigidBody = std::make_shared<RigidBody>(box, 10.0);
+
+    rigidBody->addForce(RigidBody::ExternalForce
+                        {
+                          glm::vec3(0.1, 0.1, 0.1), // Position
+                          glm::vec3(0.0, 0.0, -2.0)  // Force
+                        });
+
+    m_scene->addChild(rigidBody);
+  }
 
   m_renderer->start(m_scene.get());
 }
@@ -75,7 +92,7 @@ void PendulumApplication::loop() {
       float(2.0 * atan(getHeight() / 1920.f)), getWindowRatio(), 0.1f, 100.f));
   /*m_renderer->setView(glm::lookAt(glm::vec3(20.0 * sin(t), 20.0 * cos(t), 20.0),
                                   glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));*/
-  m_renderer->setView(glm::lookAt(glm::vec3(5.0, 0.0, 0.0),
+  m_renderer->setView(glm::lookAt(glm::vec3(10.0, 0.0, 0.0),
                                   glm::vec3(0.0, 0.0, 0.0),
                                   glm::vec3(0.0, 0.0, 1.0)));
 
