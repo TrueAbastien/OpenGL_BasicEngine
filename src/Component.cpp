@@ -83,6 +83,8 @@ bool Component::addChild(const Pointer& child)
     return false;
   }
 
+  child->setParent(this);
+
   m_children.push_back(child);
   return true;
 }
@@ -128,6 +130,23 @@ bool Component::containsChild(const Pointer& child) const
   auto it = std::find(m_children.begin(), m_children.end(), child);
 
   return it != m_children.end();
+}
+
+// ------------------------------------------------------------------------------------------------
+void Component::setParent(Component* parent)
+{
+  m_parent = parent;
+}
+
+// ------------------------------------------------------------------------------------------------
+glm::mat4 Component::worldToLocal() const
+{
+  if (m_parent != nullptr)
+  {
+    return m_parent->worldToLocal() * m_parentToLocal;
+  }
+
+  return m_parentToLocal;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -427,6 +446,8 @@ glm::vec3 Box::getScale() const
 // ------------------------------------------------------------------------------------------------
 void Box::computeCollision(CollisionManager* colMan)
 {
+  auto result = colMan->computeCollision(this);
+
   // TODO
 }
 

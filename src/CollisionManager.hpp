@@ -9,8 +9,8 @@
 
 
 // Data Response ----------------------------------------------------------------------------------
-// - First pair value is closest Body1 point in Body2
-// - Second pair value is closest Body2 point in Body1
+// - First pair value is closest Body1 point (from World) in Body2
+// - Second pair value is closest Body2 point (from World) in Body1
 using CollisionInternalResult = std::pair<glm::vec3, glm::vec3>;
 // - Optional on Collision (inexistant means no Collision
 using CollisionResult = std::optional<CollisionInternalResult>;

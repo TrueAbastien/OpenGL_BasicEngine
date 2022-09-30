@@ -44,13 +44,15 @@ class Component
                      const glm::vec3& rot = glm::vec3());
   glm::mat4 getLocalModel() const;
 
-  // Returns index
   bool addChild(const Pointer& child);
   bool removeChild(const Pointer& child);
   bool removeChild(int index);
   Pointer getChild(int index) const;
   Collection getChildren() const;
   bool containsChild(const Pointer& child) const;
+
+  void setParent(Component* parent);
+  glm::mat4 worldToLocal() const;
 
 public:
   void initialize(Renderer* renderer);
@@ -66,6 +68,8 @@ protected:
 protected:
   glm::mat4 m_parentToLocal;
   Collection m_children;
+
+  Component* m_parent = nullptr;
 };
 
 // ------------------------------------------------------------------------------------------------
