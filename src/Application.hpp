@@ -34,11 +34,13 @@ class Application {
   void run();
 
   // Application informations
-  //
   int getWidth();
   int getHeight();
   float getWindowRatio();
   bool windowDimensionChanged();
+
+protected:
+  GLFWwindow* window;
 
  private:
   enum State { stateReady, stateRun, stateExit };
@@ -46,8 +48,6 @@ class Application {
   State state;
 
   Application& operator=(const Application&) { return *this; }
-
-  GLFWwindow* window;
 
   // Time:
   float time;

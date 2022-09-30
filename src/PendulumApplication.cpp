@@ -45,7 +45,7 @@ private:
 
 PendulumApplication::PendulumApplication()
     : Application(),
-      m_renderer(std::make_unique<Renderer>()),
+      m_renderer(std::make_unique<Renderer>(window)),
       m_scene(std::make_unique<Scene>())
 {
   glCheckError(__FILE__, __LINE__);
@@ -70,7 +70,7 @@ PendulumApplication::PendulumApplication()
 
     rigidBody->addForce(RigidBody::ExternalForce
                         {
-                          glm::vec3(0.0, 0.0, 0.0), // Position
+                          glm::vec3(0.0, 0.1, 0.0), // Position
                           glm::vec3(0.0, 0.0, -2.0)  // Force
                         });
 
@@ -92,6 +92,7 @@ void PendulumApplication::loop() {
       float(2.0 * atan(getHeight() / 1920.f)), getWindowRatio(), 0.1f, 100.f));
   /*m_renderer->setView(glm::lookAt(glm::vec3(20.0 * sin(t), 20.0 * cos(t), 20.0),
                                   glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));*/
+
   m_renderer->setView(glm::lookAt(glm::vec3(10.0, 0.0, 0.0),
                                   glm::vec3(0.0, 0.0, 0.0),
                                   glm::vec3(0.0, 0.0, 1.0)));

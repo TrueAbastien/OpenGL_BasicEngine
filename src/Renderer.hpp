@@ -7,7 +7,7 @@
 class Renderer final
 {
 public:
-  Renderer();
+  Renderer(GLFWwindow* window);
 
 public:
   void start(Component* scene);
@@ -19,7 +19,11 @@ public:
   void setProjection(const glm::mat4& tr);
   void setView(const glm::mat4& tr);
 
+  GLFWwindow* getWindow() const;
+
 private:
   glm::mat4 projection = glm::mat4(1.0);
   glm::mat4 view = glm::mat4(1.0);
+
+  GLFWwindow* window;
 };

@@ -1,10 +1,14 @@
 #include "Component.hpp"
 #include "Renderer.hpp"
 
+#include <GL/glew.h>
+#include <GLFW/glfw3.h>
+
 #include "asset.hpp"
 
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/matrix_operation.hpp>
+#include <glm/gtx/polar_coordinates.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -12,6 +16,41 @@
 #include <iostream>
 #include <numeric>
 
+static Camera* mainCamera = nullptr;
+
+namespace CameraDefinitions
+{
+  const glm::vec2 linearVelocity = glm::vec2(1.0, 1.0);
+  const glm::vec2 angularVelocity = glm::vec2(glm::pi<float>() / 10'000.0, glm::pi<float>() / 10'000.0);
+  const float scrollVelocity = 0.5f;
+}
+
+// ------------------------------------------------------------------------------------------------
+void mouseCallback(GLFWwindow* window, double xpos, double ypos)
+{
+  if (mainCamera) mainCamera->mouseCallback(xpos, ypos);
+}
+
+// ------------------------------------------------------------------------------------------------
+void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+{
+  if (mainCamera) mainCamera->scrollBack((float) yoffset);
+}
+
+// ------------------------------------------------------------------------------------------------
+void inputCallback(GLFWwindow* window, double dt)
+{
+  if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+    glfwSetWindowShouldClose(window, true);
+
+
+  if (mainCamera) mainCamera->processInput(
+    ((glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) ? (1 << 1) : 0) |
+    ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) ? (1 << 2) : 0) |
+    ((glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) ? (1 << 3) : 0) |
+    ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) ? (1 << 4) : 0),
+    dt);
+}
 
 // ------------------------------------------------------------------------------------------------
 void Component::setLocalModel(const glm::mat4& model)
@@ -112,6 +151,123 @@ void Component::update(Renderer* renderer, UpdateData& data)
   {
     child->update(renderer, data);
   }
+}
+
+// ------------------------------------------------------------------------------------------------
+Scene::Scene()
+{
+  //addChild(std::make_shared<Camera>());
+}
+
+// ------------------------------------------------------------------------------------------------
+void Scene::beforeInitialize(Renderer* renderer)
+{
+  if (mainCamera != nullptr)
+  {
+    GLFWwindow* window = renderer->getWindow();
+
+    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetScrollCallback(window, scrollCallback);
+  }
+}
+
+// ------------------------------------------------------------------------------------------------
+Camera::Camera() :
+  m_position(glm::vec3(0.0)),
+  m_polar   (glm::vec3(0.0)),
+  m_distance(1.0f),
+
+  m_up     (glm::vec3(0.0, 0.0, 1.0)),
+  m_forward(glm::vec3(1.0, 0.0, 0.0)),
+  m_right  (glm::vec3(0.0, 1.0, 0.0)),
+
+  m_resetMouse(true),
+  m_lastX     (0.0),
+  m_lastY     (0.0)
+{
+  mainCamera = this;
+}
+
+// ------------------------------------------------------------------------------------------------
+void Camera::processInput(unsigned char press, float dt)
+{
+  using namespace CameraDefinitions;
+
+  if ((press & (1 << 1)) != 0)
+    m_position += m_up * linearVelocity.y * dt;
+  if ((press & (1 << 2)) != 0)
+    m_position -= m_up * linearVelocity.y * dt;
+  if ((press & (1 << 3)) != 0)
+    m_position -= m_right * linearVelocity.x * dt;
+  if ((press & (1 << 4)) != 0)
+    m_position += m_right * linearVelocity.x * dt;
+}
+
+// ------------------------------------------------------------------------------------------------
+void Camera::mouseCallback(double xpos, double ypos)
+{
+  using namespace CameraDefinitions;
+
+  if (m_resetMouse)
+  {
+    m_lastX = xpos;
+    m_lastY = ypos;
+    m_resetMouse = false;
+  }
+
+  m_polar += glm::vec2(
+    angularVelocity.x * (float)(xpos - m_lastX),
+    angularVelocity.y * (float)(m_lastY - ypos));
+
+  // make sure that when pitch is out of bounds, screen doesn't get flipped
+  float maxInclinaison = glm::pi<float>() / 2.0f;
+  if (m_polar.x > maxInclinaison)
+    m_polar.x = maxInclinaison;
+  else if (m_polar.x < -maxInclinaison)
+    m_polar.x = -maxInclinaison;
+}
+
+// ------------------------------------------------------------------------------------------------
+void Camera::scrollBack(float yoffset)
+{
+  m_distance -= yoffset;
+
+  if (m_distance < 0.1f)
+    m_distance = 0.1f;
+  else if (m_distance > 100.0f)
+    m_distance = 100.0f;
+}
+
+// ------------------------------------------------------------------------------------------------
+void Camera::beforeInitialize(Renderer* renderer)
+{
+  // TODO: compute distance ?
+}
+
+// ------------------------------------------------------------------------------------------------
+void Camera::beforeUpdate(Renderer* renderer, UpdateData& data)
+{
+  // Process Inputs
+  inputCallback(renderer->getWindow(), data.dt);
+
+  // Update Transforms
+  glm::mat4 mat = computeView();
+  setLocalModel(glm::inverse(mat));
+  renderer->setView(mat);
+}
+
+// ------------------------------------------------------------------------------------------------
+glm::mat4 Camera::computeView()
+{
+  m_forward = glm::vec3(
+    glm::sin(m_polar.y) * glm::cos(m_polar.x),
+    glm::sin(m_polar.y) * glm::sin(m_polar.x),
+    glm::cos(m_polar.y)
+  );
+  m_up = glm::vec3(m_forward.z, m_forward.y, -m_forward.x);
+  m_right = glm::cross(m_up, m_forward);
+
+  return glm::lookAt(m_position + m_forward * m_distance, m_position, m_up);
 }
 
 // ------------------------------------------------------------------------------------------------

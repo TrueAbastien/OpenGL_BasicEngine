@@ -6,7 +6,8 @@
 #include <glm/gtx/matrix_operation.hpp>
 
 // ------------------------------------------------------------------------------------------------
-Renderer::Renderer()
+Renderer::Renderer(GLFWwindow* _window)
+  : window(_window)
 {
 }
 
@@ -44,4 +45,10 @@ void Renderer::setProjection(const glm::mat4& tr)
 void Renderer::setView(const glm::mat4& tr)
 {
   view = tr;
+}
+
+// ------------------------------------------------------------------------------------------------
+GLFWwindow* Renderer::getWindow() const
+{
+  return window;
 }
