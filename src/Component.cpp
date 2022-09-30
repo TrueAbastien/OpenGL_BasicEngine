@@ -1,5 +1,7 @@
 #include "Component.hpp"
+
 #include "Renderer.hpp"
+#include "CollisionManager.hpp"
 
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
@@ -392,12 +394,40 @@ void Meshable::updateMesh()
 }
 
 // ------------------------------------------------------------------------------------------------
-Box::Box(glm::vec3 scale) : Meshable(), m_scale(scale) {}
+Physical::Physical()
+  : Meshable(), m_rendererRef(nullptr)
+{
+}
+
+// ------------------------------------------------------------------------------------------------
+Physical::~Physical()
+{
+  // TODO: remove Physical on destruction
+  // 
+  //m_rendererRef->getCollisionManager()->removePhysical(this);
+}
+
+// ------------------------------------------------------------------------------------------------
+void Physical::beforeInitialize(Renderer* renderer)
+{
+  m_rendererRef = renderer;
+
+  renderer->getCollisionManager()->addPhysical(this);
+}
+
+// ------------------------------------------------------------------------------------------------
+Box::Box(glm::vec3 scale) : Physical(), m_scale(scale) {}
 
 // ------------------------------------------------------------------------------------------------
 glm::vec3 Box::getScale() const
 {
   return m_scale;
+}
+
+// ------------------------------------------------------------------------------------------------
+void Box::computeCollision(CollisionManager* colMan)
+{
+  // TODO
 }
 
 // ------------------------------------------------------------------------------------------------

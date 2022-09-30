@@ -3,6 +3,7 @@
 #include "Component.hpp"
 #include "Application.hpp"
 #include "Shader.hpp"
+#include "CollisionManager.hpp"
 
 class Renderer final
 {
@@ -21,9 +22,13 @@ public:
 
   GLFWwindow* getWindow() const;
 
+  std::shared_ptr<CollisionManager> getCollisionManager() const;
+
 private:
   glm::mat4 projection = glm::mat4(1.0);
   glm::mat4 view = glm::mat4(1.0);
 
   GLFWwindow* window;
+
+  std::shared_ptr<CollisionManager> collisionManager;
 };

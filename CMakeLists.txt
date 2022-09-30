@@ -18,6 +18,8 @@ add_executable(${proj}
   src/Renderer.cpp
   src/Component.hpp
   src/Component.cpp
+  src/CollisionManager.hpp
+  src/CollisionManager.cpp
 )
 
 set_property(TARGET ${proj} PROPERTY CXX_STANDARD 20)

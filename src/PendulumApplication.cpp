@@ -70,7 +70,7 @@ PendulumApplication::PendulumApplication()
 
     rigidBody->addForce(RigidBody::ExternalForce
                         {
-                          glm::vec3(0.0, 0.1, 0.0), // Position
+                          glm::vec3(0.0, 0.0, 0.0), // Position
                           glm::vec3(0.0, 0.0, -2.0)  // Force
                         });
 

@@ -12,6 +12,7 @@
 
 // Forward Declaration
 class Renderer;
+class CollisionManager;
 
 // Vertex Data Content
 struct VertexType {
@@ -157,12 +158,33 @@ protected:
 };
 
 // ------------------------------------------------------------------------------------------------
-class Box : public Meshable
+class Physical : public Meshable
+{
+protected:
+  Physical();
+
+public:
+  virtual ~Physical();
+
+protected:
+  virtual void beforeInitialize(Renderer* renderer) override;
+
+public:
+  virtual void computeCollision(CollisionManager* colMan) = 0;
+
+private:
+  Renderer* m_rendererRef;
+};
+
+// ------------------------------------------------------------------------------------------------
+class Box : public Physical
 {
 public:
   Box(glm::vec3 scale);
 
   glm::vec3 getScale() const;
+
+  void computeCollision(CollisionManager* colMan) override;
 
 protected:
   void beforeInitialize(Renderer* renderer) override;

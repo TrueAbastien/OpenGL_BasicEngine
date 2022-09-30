@@ -7,7 +7,7 @@
 
 // ------------------------------------------------------------------------------------------------
 Renderer::Renderer(GLFWwindow* _window)
-  : window(_window)
+  : window(_window), collisionManager(std::make_shared<CollisionManager>())
 {
 }
 
@@ -51,4 +51,10 @@ void Renderer::setView(const glm::mat4& tr)
 GLFWwindow* Renderer::getWindow() const
 {
   return window;
+}
+
+// ------------------------------------------------------------------------------------------------
+std::shared_ptr<CollisionManager> Renderer::getCollisionManager() const
+{
+  return collisionManager;
 }
