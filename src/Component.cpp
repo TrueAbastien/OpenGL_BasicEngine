@@ -163,14 +163,15 @@ void Component::initialize(Renderer* renderer)
 // ------------------------------------------------------------------------------------------------
 void Component::update(Renderer* renderer, UpdateData& data)
 {
-  data.worldToParent = data.worldToLocal;
-  data.worldToLocal *= m_parentToLocal;
+  UpdateData newData = data;
+  newData.worldToParent = data.worldToLocal;
+  newData.worldToLocal *= m_parentToLocal;
 
-  beforeUpdate(renderer, data);
+  beforeUpdate(renderer, newData);
 
   for (auto& child : m_children)
   {
-    child->update(renderer, data);
+    child->update(renderer, newData);
   }
 }
 
@@ -444,11 +445,9 @@ glm::vec3 Box::getScale() const
 }
 
 // ------------------------------------------------------------------------------------------------
-void Box::computeCollision(CollisionManager* colMan)
+CurrentTargetCollisions Box::computeCollision(CollisionManager* colMan)
 {
-  auto result = colMan->computeCollision(this);
-
-  // TODO
+  return colMan->computeCollision(this);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -500,6 +499,8 @@ void Box::beforeInitialize(Renderer* renderer)
   index.push_back(7); index.push_back(4); index.push_back(6);  // H, E, G
 
   Meshable::initializeRenderable(vertices, index);
+
+  Physical::beforeInitialize(renderer);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -511,7 +512,7 @@ void Box::beforeUpdate(Renderer* renderer, UpdateData& data)
 }
 
 // ------------------------------------------------------------------------------------------------
-RigidBody::RigidBody(const std::shared_ptr<Meshable>& target, double mass)
+RigidBody::RigidBody(const std::shared_ptr<Physical>& target, double mass)
   : m_target(target), m_mass(mass),
   m_position(glm::vec3(0.0)), m_rotation(glm::mat3(1.0)),
   m_linear_velocity(glm::vec3(0.0)), m_derived_rotation(glm::mat3(0.0)),
@@ -523,10 +524,6 @@ RigidBody::RigidBody(const std::shared_ptr<Meshable>& target, double mass)
   }
 
   addChild(target);
-
-  // Compute Inertia Matrix
-  target->initialize(nullptr);
-  computeInertia();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -573,8 +570,26 @@ double RigidBody::getMass() const
 }
 
 // ------------------------------------------------------------------------------------------------
+void RigidBody::initialize(Renderer* renderer)
+{
+  for (auto& child : m_children)
+  {
+    child->initialize(renderer);
+  }
+
+  // Compute Inertia Matrix
+  computeInertia();
+}
+
+// ------------------------------------------------------------------------------------------------
 void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
+  auto collisions = m_target->computeCollision(renderer->getCollisionManager().get());
+  if (!collisions.empty())
+  {
+    return;
+  }
+
   // Position
   m_linear_velocity += m_force * (float) (data.dt / m_mass);
   m_position += m_linear_velocity * (float) data.dt;

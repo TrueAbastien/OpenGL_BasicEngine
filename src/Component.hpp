@@ -13,6 +13,10 @@
 // Forward Declaration
 class Renderer;
 class CollisionManager;
+class Physical;
+
+// Forward Inner Using (see. CollisionManager.hpp)
+using CurrentTargetCollisions = std::map<Physical*, std::pair<glm::vec3, glm::vec3>>;
 
 // Vertex Data Content
 struct VertexType {
@@ -55,8 +59,8 @@ class Component
   glm::mat4 worldToLocal() const;
 
 public:
-  void initialize(Renderer* renderer);
-  void update(Renderer* renderer, UpdateData& data);
+  virtual void initialize(Renderer* renderer);
+  virtual void update(Renderer* renderer, UpdateData& data);
 
 protected:
   virtual void beforeInitialize(Renderer* renderer) {}
@@ -174,7 +178,7 @@ protected:
   virtual void beforeInitialize(Renderer* renderer) override;
 
 public:
-  virtual void computeCollision(CollisionManager* colMan) = 0;
+  virtual CurrentTargetCollisions computeCollision(CollisionManager* colMan) = 0;
 
 private:
   Renderer* m_rendererRef;
@@ -188,7 +192,7 @@ public:
 
   glm::vec3 getScale() const;
 
-  void computeCollision(CollisionManager* colMan) override;
+  CurrentTargetCollisions computeCollision(CollisionManager* colMan) override;
 
 protected:
   void beforeInitialize(Renderer* renderer) override;
@@ -209,7 +213,7 @@ public:
   };
 
 public:
-  RigidBody(const std::shared_ptr<Meshable>& target, double mass = 1.0);
+  RigidBody(const std::shared_ptr<Physical>& target, double mass = 1.0);
 
   // Returns the current amount of External Forces
   size_t addForce(const ExternalForce& force);
@@ -217,6 +221,9 @@ public:
 
   bool setMass(double mass);
   double getMass() const;
+
+protected:
+  void initialize(Renderer* renderer) override;
 
 private:
   void beforeUpdate(Renderer* renderer, UpdateData& data) override;
@@ -226,7 +233,7 @@ private:
   void computeInertia();
 
 protected:
-  std::shared_ptr<Meshable> m_target;
+  std::shared_ptr<Physical> m_target;
 
   glm::vec3 m_linear_velocity;
   glm::mat3 m_derived_rotation;
