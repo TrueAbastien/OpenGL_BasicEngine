@@ -248,7 +248,7 @@ void Camera::mouseCallback(double xpos, double ypos)
     angularVelocity.y * (float)(m_lastY - ypos));
 
   // make sure that when pitch is out of bounds, screen doesn't get flipped
-  float maxInclinaison = glm::pi<float>() / 2.0f;
+  constexpr float maxInclinaison = glm::pi<float>() * 0.5f;
   if (m_polar.x > maxInclinaison)
     m_polar.x = maxInclinaison;
   else if (m_polar.x < -maxInclinaison)
@@ -287,15 +287,15 @@ void Camera::beforeUpdate(Renderer* renderer, UpdateData& data)
 // ------------------------------------------------------------------------------------------------
 glm::mat4 Camera::computeView()
 {
-  m_forward = glm::vec3(
-    glm::sin(m_polar.x) * glm::cos(m_polar.y),
-    glm::sin(m_polar.x) * glm::sin(m_polar.y),
-    glm::cos(m_polar.x)
-  );
-  m_up = glm::vec3(m_forward.z, m_forward.y, -m_forward.x);
-  m_right = glm::cross(m_up, m_forward);
+  m_forward = glm::normalize(glm::vec3(
+    glm::sin(m_polar.y) * glm::cos(m_polar.x),
+    glm::cos(m_polar.y),
+    glm::sin(m_polar.y) * glm::sin(m_polar.x)
+  ));
+  m_right = glm::normalize(glm::cross(m_forward, glm::vec3(0, 1, 0)));
+  m_up = glm::normalize(glm::cross(m_right, m_forward));
 
-  return glm::lookAt(m_position + m_forward * m_distance, m_position, m_up);
+  return glm::lookAt(m_position, m_position + m_forward * m_distance, m_up);
 }
 
 // ------------------------------------------------------------------------------------------------

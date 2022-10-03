@@ -97,9 +97,9 @@ void PendulumApplication::loop() {
   /*m_renderer->setView(glm::lookAt(glm::vec3(20.0 * sin(t), 20.0 * cos(t), 20.0),
                                   glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));*/
 
-  m_renderer->setView(glm::lookAt(glm::vec3(10.0, 0.0, 0.0),
+  /*m_renderer->setView(glm::lookAt(glm::vec3(10.0, 0.0, 0.0),
                                   glm::vec3(0.0, 0.0, 0.0),
-                                  glm::vec3(0.0, 0.0, 1.0)));
+                                  glm::vec3(0.0, 0.0, 1.0)));*/
 
   // clear
   glClear(GL_COLOR_BUFFER_BIT);
