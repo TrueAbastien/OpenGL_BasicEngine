@@ -194,6 +194,12 @@ void Scene::beforeInitialize(Renderer* renderer)
 }
 
 // ------------------------------------------------------------------------------------------------
+void Scene::beforeUpdate(Renderer* renderer, UpdateData& data)
+{
+  renderer->getCollisionManager()->clearCache();
+}
+
+// ------------------------------------------------------------------------------------------------
 Camera::Camera() :
   m_position(glm::vec3(0.0)),
   m_polar   (glm::vec3(0.0)),

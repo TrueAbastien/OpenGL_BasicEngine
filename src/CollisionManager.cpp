@@ -9,7 +9,8 @@ namespace CollisionUtils
 
 // ------------------------------------------------------------------------------------------------
 CollisionManager::CollisionManager()
-  : m_colliders(std::vector<Physical*>(0))
+  : m_colliders(std::vector<Physical*>(0)),
+  m_cachedResults{ }
 {
 }
 
@@ -49,4 +50,10 @@ bool CollisionManager::removePhysical(Physical* physical)
   m_colliders.erase(it);
 
   return true;
+}
+
+// ------------------------------------------------------------------------------------------------
+void CollisionManager::clearCache()
+{
+  m_cachedResults.clear();
 }

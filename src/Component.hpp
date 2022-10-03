@@ -84,6 +84,7 @@ public:
 
 protected:
   void beforeInitialize(Renderer* renderer) override;
+  void beforeUpdate(Renderer* renderer, UpdateData& data) override;
 };
 
 // ------------------------------------------------------------------------------------------------

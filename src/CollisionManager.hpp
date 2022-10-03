@@ -175,8 +175,11 @@ public:
   template <CollisionUtils::PhysicalDerived T>
   Result computeCollision(T* target);
 
+  void clearCache();
+
 private:
   std::vector<Physical*> m_colliders;
+  std::map<Physical*, Result> m_cachedResults;
 };
 
 // ------------------------------------------------------------------------------------------------
@@ -192,6 +195,12 @@ inline CollisionManager::Result CollisionManager::computeCollision(T* target)
       continue;
     }
 
+    if (m_cachedResults[physical].contains(target))
+    {
+      result[physical] = m_cachedResults[physical][target];
+      continue;
+    }
+
     CollisionResult res = CollisionUtils::concreteCompute(target, physical);
     if (!res.has_value())
     {
@@ -200,6 +209,9 @@ inline CollisionManager::Result CollisionManager::computeCollision(T* target)
 
     result[physical] = *res;
   }
+
+  // Cache results to prevent recomputation
+  m_cachedResults[target] = result;
 
   return result;
 }
