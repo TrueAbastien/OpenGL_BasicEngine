@@ -147,6 +147,17 @@ protected:
 };
 
 // ------------------------------------------------------------------------------------------------
+class VisibleTransform final : public Renderable
+{
+public:
+  VisibleTransform();
+
+protected:
+  void beforeInitialize(Renderer* renderer) override;
+  void beforeUpdate(Renderer* renderer, UpdateData& data) override;
+};
+
+// ------------------------------------------------------------------------------------------------
 class Meshable : public Renderable
 {
 protected:

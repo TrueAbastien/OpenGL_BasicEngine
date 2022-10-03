@@ -47,9 +47,9 @@ void inputCallback(GLFWwindow* window, double dt)
 
 
   if (mainCamera) mainCamera->processInput(
-    ((glfwGetKey(window, GLFW_KEY_Z) == GLFW_PRESS) ? (1 << 1) : 0) |
+    ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) ? (1 << 1) : 0) |
     ((glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) ? (1 << 2) : 0) |
-    ((glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) ? (1 << 3) : 0) |
+    ((glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) ? (1 << 3) : 0) |
     ((glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) ? (1 << 4) : 0),
     dt);
 }
@@ -178,7 +178,7 @@ void Component::update(Renderer* renderer, UpdateData& data)
 // ------------------------------------------------------------------------------------------------
 Scene::Scene()
 {
-  //addChild(std::make_shared<Camera>());
+  addChild(std::make_shared<Camera>());
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -288,9 +288,9 @@ void Camera::beforeUpdate(Renderer* renderer, UpdateData& data)
 glm::mat4 Camera::computeView()
 {
   m_forward = glm::vec3(
-    glm::sin(m_polar.y) * glm::cos(m_polar.x),
-    glm::sin(m_polar.y) * glm::sin(m_polar.x),
-    glm::cos(m_polar.y)
+    glm::sin(m_polar.x) * glm::cos(m_polar.y),
+    glm::sin(m_polar.x) * glm::sin(m_polar.y),
+    glm::cos(m_polar.x)
   );
   m_up = glm::vec3(m_forward.z, m_forward.y, -m_forward.x);
   m_right = glm::cross(m_up, m_forward);
@@ -378,6 +378,24 @@ void Renderable::updateRenderable(Renderer* renderer, glm::mat4 worldToLocal, GL
   glBindVertexArray(0);
 
   shaderProgram.unuse();
+}
+
+// ------------------------------------------------------------------------------------------------
+VisibleTransform::VisibleTransform()
+  : Renderable()
+{
+}
+
+// ------------------------------------------------------------------------------------------------
+void VisibleTransform::beforeInitialize(Renderer* renderer)
+{
+  // TODO
+}
+
+// ------------------------------------------------------------------------------------------------
+void VisibleTransform::beforeUpdate(Renderer* renderer, UpdateData& data)
+{
+  // TODO
 }
 
 // ------------------------------------------------------------------------------------------------
