@@ -587,6 +587,7 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
   auto collisions = m_target->computeCollision(renderer->getCollisionManager().get());
   if (!collisions.empty())
   {
+    // TODO: better force computation
     return;
   }
 
@@ -601,7 +602,10 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
   // ---
   auto starMatrix = [](const glm::vec3& v) -> glm::mat3
   {
-    return glm::mat3(0.0, -v.z, v.y, v.z, 0.0, -v.x, -v.y, v.x, 0.0);
+    return glm::mat3(
+      0.0, -v.z, v.y,
+      v.z, 0.0, -v.x,
+      -v.y, v.x, 0.0);
   };
   m_derived_rotation = starMatrix(angular_velocity) * m_rotation;
   // ---
