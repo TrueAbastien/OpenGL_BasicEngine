@@ -102,7 +102,8 @@ public:
 
 public:
   void processInput(unsigned char press, float dt);
-  void mouseCallback(double xpos, double ypos);
+  void mouseMoveCallback(double xpos, double ypos);
+  void mouseClickCallback(int button, int action, double xpos, double ypos);
   void scrollBack(float yoffset);
 
 protected:
@@ -121,7 +122,7 @@ private:
   glm::vec3 m_forward;
   glm::vec3 m_right;
 
-  bool m_resetMouse;
+  bool m_enableRotation;
   double m_lastX;
   double m_lastY;
 };

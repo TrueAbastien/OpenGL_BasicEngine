@@ -28,9 +28,17 @@ namespace CameraDefinitions
 }
 
 // ------------------------------------------------------------------------------------------------
-void mouseCallback(GLFWwindow* window, double xpos, double ypos)
+void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
-  if (mainCamera) mainCamera->mouseCallback(xpos, ypos);
+  if (mainCamera) mainCamera->mouseMoveCallback(xpos, ypos);
+}
+
+// ------------------------------------------------------------------------------------------------
+void mouseClickCallback(GLFWwindow* window, int button, int action, int mods)
+{
+  double xpos, ypos;
+  glfwGetCursorPos(window, &xpos, &ypos);
+  if (mainCamera) mainCamera->mouseClickCallback(button, action, xpos, ypos);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -187,7 +195,8 @@ void Scene::beforeInitialize(Renderer* renderer)
   {
     GLFWwindow* window = renderer->getWindow();
 
-    glfwSetCursorPosCallback(window, mouseCallback);
+    glfwSetCursorPosCallback(window, mouseMoveCallback);
+    glfwSetMouseButtonCallback(window, mouseClickCallback);
     glfwSetScrollCallback(window, scrollCallback);
   }
 }
@@ -208,7 +217,7 @@ Camera::Camera() :
   m_forward(glm::vec3(1.0, 0.0, 0.0)),
   m_right  (glm::vec3(0.0, 1.0, 0.0)),
 
-  m_resetMouse(true),
+  m_enableRotation(false),
   m_lastX     (0.0),
   m_lastY     (0.0)
 {
@@ -231,16 +240,11 @@ void Camera::processInput(unsigned char press, float dt)
 }
 
 // ------------------------------------------------------------------------------------------------
-void Camera::mouseCallback(double xpos, double ypos)
+void Camera::mouseMoveCallback(double xpos, double ypos)
 {
-  using namespace CameraDefinitions;
+  if (!m_enableRotation) return;
 
-  if (m_resetMouse)
-  {
-    m_lastX = xpos;
-    m_lastY = ypos;
-    m_resetMouse = false;
-  }
+  using namespace CameraDefinitions;
 
   m_polar += glm::vec2(
     angularVelocity.x * (float)(xpos - m_lastX),
@@ -255,6 +259,25 @@ void Camera::mouseCallback(double xpos, double ypos)
     m_polar.y = maxInclinaison;
   else if (m_polar.y < 0)
     m_polar.y = 0;
+}
+
+// ------------------------------------------------------------------------------------------------
+void Camera::mouseClickCallback(int button, int action, double xpos, double ypos)
+{
+  if (button == GLFW_MOUSE_BUTTON_LEFT)
+  {
+    if (action == GLFW_PRESS)
+    {
+      m_enableRotation = true;
+
+      m_lastX = xpos;
+      m_lastY = ypos;
+    }
+    else if (action == GLFW_RELEASE)
+    {
+      m_enableRotation = false;
+    }
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
