@@ -22,8 +22,8 @@ static Camera* mainCamera = nullptr;
 
 namespace CameraDefinitions
 {
-  const glm::vec2 linearVelocity = glm::vec2(1.0, 1.0);
-  const glm::vec2 angularVelocity = glm::vec2(glm::pi<float>() / 10'000.0, glm::pi<float>() / 10'000.0);
+  const glm::vec2 linearVelocity = glm::vec2(10.0, 10.0);
+  const glm::vec2 angularVelocity = glm::vec2(glm::pi<float>() / 1'000.0, glm::pi<float>() / 1'000.0);
   const float scrollVelocity = 0.5f;
 }
 
@@ -44,7 +44,6 @@ void inputCallback(GLFWwindow* window, double dt)
 {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
-
 
   if (mainCamera) mainCamera->processInput(
     ((glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) ? (1 << 1) : 0) |
@@ -226,9 +225,9 @@ void Camera::processInput(unsigned char press, float dt)
   if ((press & (1 << 2)) != 0)
     m_position -= m_up * linearVelocity.y * dt;
   if ((press & (1 << 3)) != 0)
-    m_position -= m_right * linearVelocity.x * dt;
-  if ((press & (1 << 4)) != 0)
     m_position += m_right * linearVelocity.x * dt;
+  if ((press & (1 << 4)) != 0)
+    m_position -= m_right * linearVelocity.x * dt;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -247,12 +246,15 @@ void Camera::mouseCallback(double xpos, double ypos)
     angularVelocity.x * (float)(xpos - m_lastX),
     angularVelocity.y * (float)(m_lastY - ypos));
 
+  m_lastX = xpos;
+  m_lastY = ypos;
+
   // make sure that when pitch is out of bounds, screen doesn't get flipped
-  constexpr float maxInclinaison = glm::pi<float>() * 0.5f;
-  if (m_polar.x > maxInclinaison)
-    m_polar.x = maxInclinaison;
-  else if (m_polar.x < -maxInclinaison)
-    m_polar.x = -maxInclinaison;
+  constexpr float maxInclinaison = glm::pi<float>();
+  if (m_polar.y > maxInclinaison)
+    m_polar.y = maxInclinaison;
+  else if (m_polar.y < 0)
+    m_polar.y = 0;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -289,13 +291,13 @@ glm::mat4 Camera::computeView()
 {
   m_forward = glm::normalize(glm::vec3(
     glm::sin(m_polar.y) * glm::cos(m_polar.x),
-    glm::cos(m_polar.y),
-    glm::sin(m_polar.y) * glm::sin(m_polar.x)
+    glm::sin(m_polar.y) * glm::sin(m_polar.x),
+    glm::cos(m_polar.y)
   ));
-  m_right = glm::normalize(glm::cross(m_forward, glm::vec3(0, 1, 0)));
+  m_right = glm::normalize(glm::cross(m_forward, glm::vec3(0, 0, 1)));
   m_up = glm::normalize(glm::cross(m_right, m_forward));
 
-  return glm::lookAt(m_position, m_position + m_forward * m_distance, m_up);
+  return glm::lookAt(m_position + m_forward * m_distance, m_position, m_up);
 }
 
 // ------------------------------------------------------------------------------------------------
