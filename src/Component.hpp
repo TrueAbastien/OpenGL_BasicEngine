@@ -106,6 +106,8 @@ public:
   void mouseClickCallback(int button, int action, double xpos, double ypos);
   void scrollBack(float yoffset);
 
+  void reset();
+
 protected:
   void beforeInitialize(Renderer* renderer) override;
   void beforeUpdate(Renderer* renderer, UpdateData& data) override;
