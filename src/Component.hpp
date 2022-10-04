@@ -221,10 +221,16 @@ protected:
 class RigidBody final : public Component
 {
 public:
+  enum ForceReference
+  {
+    LOCAL,
+    WORLD
+  };
   struct ExternalForce
   {
     glm::vec3 position;
     glm::vec3 force;
+    ForceReference type;
   };
 
 public:
