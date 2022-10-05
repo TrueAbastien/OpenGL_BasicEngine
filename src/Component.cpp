@@ -286,7 +286,7 @@ void Camera::reset()
 {
   m_position = glm::vec3(0.0);
   m_polar = glm::vec2(0.0, glm::pi<float>() * 0.5f);
-  m_distance = 1.0f;
+  m_distance = 10.0f;
 
   m_up = glm::vec3(0.0, 0.0, 1.0);
   m_forward = glm::vec3(1.0, 0.0, 0.0);
@@ -569,8 +569,9 @@ void Box::beforeUpdate(Renderer* renderer, UpdateData& data)
 // ------------------------------------------------------------------------------------------------
 RigidBody::RigidBody(const std::shared_ptr<Physical>& target, double mass)
   : m_target(target), m_mass(mass),
-  m_position(glm::vec3(0.0)), m_rotation(glm::mat3(1.0)),
-  m_linear_velocity(glm::vec3(0.0)), m_derived_rotation(glm::mat3(0.0)),
+  m_position(glm::vec3(0.0)), m_rotation(glm::vec3(0.0)),
+  m_linear_velocity(glm::vec3(0.0)), //m_derived_rotation(glm::mat3(0.0)),
+  m_angularMomentum(glm::vec3(0.0)),
   m_force(glm::vec3(0.0)), m_torque(glm::vec3(0.0))
 {
   if (target == nullptr)
@@ -651,20 +652,23 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
   m_position += m_linear_velocity * (float) data.dt;
 
   // Rotation
-  glm::mat3 Rt = glm::transpose(m_rotation);
-  glm::mat3 invI = m_rotation * m_invIBody * Rt;
-  glm::vec3 angular_velocity = invI * m_torque;
+  m_angularMomentum += m_torque * (float) data.dt;
   // ---
-  auto starMatrix = [](const glm::vec3& v) -> glm::mat3
+  glm::mat3 rot = m_parentToLocal;
+  glm::mat3 rot_t = glm::transpose(rot);
+  glm::mat3 invI = rot * m_invIBody * rot_t;
+  glm::vec3 angular_velocity = invI * m_angularMomentum;
+  // ---
+  /*auto starMatrix = [](const glm::vec3& v) -> glm::mat3
   {
     return glm::mat3(
       0.0, -v.z, v.y,
       v.z, 0.0, -v.x,
       -v.y, v.x, 0.0);
   };
-  m_derived_rotation = starMatrix(angular_velocity) * m_rotation;
+  m_derived_rotation = starMatrix(glm::normalize(angular_velocity)) * m_rotation;*/
   // ---
-  m_rotation += m_derived_rotation * (float) data.dt; // TODO ?
+  m_rotation += angular_velocity * (float) data.dt; // TODO ?
 
   updateTransform();
   data.worldToLocal = data.worldToParent * m_parentToLocal;
@@ -673,10 +677,7 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
 // ------------------------------------------------------------------------------------------------
 void RigidBody::updateTransform()
 {
-  glm::mat4x4 mat(m_rotation);
-  mat = glm::translate(mat, m_position);
-
-  setLocalModel(mat);
+  setLocalModel(m_position, m_rotation);
 }
 
 // ------------------------------------------------------------------------------------------------

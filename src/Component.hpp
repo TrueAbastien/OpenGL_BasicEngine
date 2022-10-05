@@ -257,12 +257,14 @@ protected:
   std::shared_ptr<Physical> m_target;
 
   glm::vec3 m_linear_velocity;
-  glm::mat3 m_derived_rotation;
+  //glm::mat3 m_derived_rotation;
+  glm::vec3 m_angularMomentum;
 
   glm::mat3 m_invIBody;
 
   glm::vec3 m_position;
-  glm::mat3 m_rotation;
+  glm::vec3 m_rotation;
+  //glm::mat3 m_rotation;
 
   double m_mass;
 

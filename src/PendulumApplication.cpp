@@ -69,24 +69,24 @@ PendulumApplication::PendulumApplication()
     ground->setLocalModel(glm::vec3(0.0, 0.0, -3.0));
     m_scene->addChild(ground);
 
-    auto box = std::make_shared<Box>(glm::vec3(0.1f, 0.1f, 1.0f));
+    auto box = std::make_shared<Box>(glm::vec3(1.0f, 1.0f, 1.0f));
     auto rigidBody = std::make_shared<RigidBody>(box, 10.0);
 
     rigidBody->addForce(RigidBody::ExternalForce
                         {
-                          glm::vec3(0.0, 0.0, 0.3), // Position
-                          glm::vec3(0.0, 50.0, 0.0)  // Force
+                          glm::vec3(0.0, 0.0, 0.5), // Position
+                          glm::vec3(0.0, 5.0, 0.0)  // Force
                         });
     rigidBody->addForce(RigidBody::ExternalForce
                         {
-                          glm::vec3(0.0, 0.0, -0.3), // Position
-                          glm::vec3(0.0, -50.0, 0.0)  // Force
+                          glm::vec3(0.0, 0.0, -0.5), // Position
+                          glm::vec3(0.0, -5.0, 0.0)  // Force
                         });
-    rigidBody->addForce(RigidBody::ExternalForce
-                        {
-                          glm::vec3(0.0, 0.0, 0.0), // Position
-                          glm::vec3(0.0, 0.0, -10.0)  // Force
-                        });
+    //rigidBody->addForce(RigidBody::ExternalForce
+    //                    {
+    //                      glm::vec3(0.0, 0.0, 0.0), // Position
+    //                      glm::vec3(0.0, 0.0, -10.0)  // Force
+    //                    });
 
     m_scene->addChild(rigidBody);
   }
@@ -104,12 +104,6 @@ void PendulumApplication::loop() {
   // set matrix : projection + view
   m_renderer->setProjection(glm::perspective(
       float(2.0 * atan(getHeight() / 1920.f)), getWindowRatio(), 0.1f, 100.f));
-  /*m_renderer->setView(glm::lookAt(glm::vec3(20.0 * sin(t), 20.0 * cos(t), 20.0),
-                                  glm::vec3(0.0, 0.0, 0.0), glm::vec3(0.0, 0.0, 1.0)));*/
-
-  /*m_renderer->setView(glm::lookAt(glm::vec3(10.0, 0.0, 0.0),
-                                  glm::vec3(0.0, 0.0, 0.0),
-                                  glm::vec3(0.0, 0.0, 1.0)));*/
 
   // clear
   glClear(GL_COLOR_BUFFER_BIT);
