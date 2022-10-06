@@ -102,10 +102,6 @@ namespace CollisionUtils
       glm::vec3 miScale = target->getScale() / 2.0f;
       glm::mat4 bodyLocal_2_TargetLocal = glm::inverse(target->worldToLocal()) * body->worldToLocal();
 
-      float distMin = FLT_MAX;
-      bool collision = false;
-      glm::vec3 position;
-
       const auto vertices = body->getVertices();
       for (const auto& vertex : vertices)
       {
@@ -114,24 +110,20 @@ namespace CollisionUtils
             glm::abs(pos.y) < miScale.y &&
             glm::abs(pos.z) < miScale.z)
         {
-          collision = true;
+          glm::vec3 targetOrigin_inBody = glm::inverse(bodyLocal_2_TargetLocal) * glm::vec4(0.0, 0.0, 0.0, 1.0);
+          glm::vec3 miScale = body->getScale() * 0.5f;
 
-          // TODO: better position selection
-          float dist = glm::distance(pos, glm::vec3(0.0));
-          if (dist < distMin)
-          {
-            distMin = dist;
-            position = pos;
-          }
+          float factor = std::min(
+            {
+              miScale.x / targetOrigin_inBody.x,
+              miScale.y / targetOrigin_inBody.y,
+              miScale.z / targetOrigin_inBody.z
+            });
+          return bodyLocal_2_TargetLocal * glm::vec4(targetOrigin_inBody * factor, 1.0);
         }
       }
 
-      if (!collision)
-      {
-        return std::nullopt;
-      }
-
-      return position;
+      return std::nullopt;
     };
 
     auto res1 = computeCollision(body1, body2);
