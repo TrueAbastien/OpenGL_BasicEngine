@@ -8,13 +8,6 @@
 #include <tuple>
 
 
-// Data Response ----------------------------------------------------------------------------------
-// - First pair value is closest Body2 point (from Body1) in Body1
-// - Second pair value is closest Body1 point (from Body2) in Body2
-using CollisionInternalResult = std::pair<glm::vec3, glm::vec3>;
-// - Optional on Collision (inexistant means no Collision
-using CollisionResult = std::optional<CollisionInternalResult>;
-
 // ------------------------------------------------------------------------------------------------
 namespace CollisionUtils
 {
@@ -117,26 +110,41 @@ namespace CollisionUtils
       return false;
     };
 
-    auto closestPoint = [](Box* target, Box* body) -> glm::vec3
+    auto closestPoint = [](Box* target, Box* body) -> CollisionBodyData
     {
-      glm::mat4 bodyLocal_2_TargetLocal = glm::inverse(target->worldToLocal()) * body->worldToLocal();
+      glm::mat4 target_World2Local = target->worldToLocal();
+      glm::mat4 body_World2Local = body->worldToLocal();
+      glm::mat4 bodyLocal_2_TargetLocal = glm::inverse(target_World2Local) * body_World2Local;
 
       glm::vec3 targetOrigin_inBody = glm::inverse(bodyLocal_2_TargetLocal) * glm::vec4(0.0, 0.0, 0.0, 1.0);
       glm::vec3 miScale = body->getScale() * 0.5f;
 
-      float factor = std::min(
+      using FactorInfo = std::pair<float, glm::vec3>;
+      FactorInfo factorInfo = std::min(
         {
-          miScale.x / targetOrigin_inBody.x,
-          miScale.y / targetOrigin_inBody.y,
-          miScale.z / targetOrigin_inBody.z
+          std::make_pair(miScale.x / targetOrigin_inBody.x, glm::vec3(1.0, 0.0, 0.0)),
+          std::make_pair(miScale.y / targetOrigin_inBody.y, glm::vec3(0.0, 1.0, 0.0)),
+          std::make_pair(miScale.z / targetOrigin_inBody.z, glm::vec3(0.0, 0.0, 1.0))
+        },
+        [](const FactorInfo& a, const FactorInfo& b)
+        {
+          return a.first < b.first;
         });
 
-      if (factor >= 1.0f)
+      if (factorInfo.first >= 1.0f)
       {
-        return glm::vec3(0.0);
+        return CollisionBodyData
+        {
+          target_World2Local * glm::vec4(0.0, 0.0, 0.0, 1.0), // Position
+          glm::normalize((glm::vec3) (body_World2Local * glm::vec4(targetOrigin_inBody, 0.0))) // Normal
+        };
       }
 
-      return bodyLocal_2_TargetLocal * glm::vec4(targetOrigin_inBody * factor, 1.0);
+      return CollisionBodyData
+      {
+        body_World2Local * glm::vec4(targetOrigin_inBody * factorInfo.first, 1.0), // Position
+        target_World2Local * glm::vec4(factorInfo.second, 0.0) // Normal
+      };
     };
 
     if (!isColliding(body1, body2) && !isColliding(body2, body1))

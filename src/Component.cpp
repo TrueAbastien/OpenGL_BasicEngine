@@ -592,6 +592,15 @@ size_t RigidBody::addForce(const ExternalForce& force)
 }
 
 // ------------------------------------------------------------------------------------------------
+size_t RigidBody::addForces(const std::vector<ExternalForce>& forces)
+{
+  m_external_forces.insert(m_external_forces.end(), forces.begin(), forces.end());
+  computeForceTorque();
+
+  return m_external_forces.size();
+}
+
+// ------------------------------------------------------------------------------------------------
 bool RigidBody::removeForce(size_t index)
 {
   if (index >= m_external_forces.size())
@@ -640,43 +649,42 @@ void RigidBody::initialize(Renderer* renderer)
 // ------------------------------------------------------------------------------------------------
 void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
+  removeImpulseForce();
+
+  // Collision(s) response
   auto collisions = m_target->computeCollision(renderer->getCollisionManager().get());
   if (!collisions.empty())
   {
-    for (const auto& collision : collisions)
+    /*for (const auto& collision : collisions)
     {
-      glm::vec3 p1 = m_target->worldToLocal() * glm::vec4(collision.second.first, 1.0);
-      glm::vec3 p2 = collision.first->worldToLocal() * glm::vec4(collision.second.second, 1.0);
+      m_position += collision.second.second.worldPosition - collision.second.first.worldPosition;
+    }*/
 
-      m_position += p2 - p1;
-    }
+    // TODO
   }
 
-  else
+  // Position
+  m_linear_velocity += m_force * (float) (data.dt / m_mass);
+  m_position += m_linear_velocity * (float) data.dt;
+
+  // Rotation
+  m_angularMomentum += m_torque * (float) data.dt;
+  // ---
+  glm::mat3 rot = m_parentToLocal;
+  glm::mat3 rot_t = glm::transpose(rot);
+  glm::mat3 invI = rot * m_invIBody * rot_t;
+  glm::vec3 angular_velocity = invI * m_angularMomentum;
+  // ---
+  /*auto starMatrix = [](const glm::vec3& v) -> glm::mat3
   {
-    // Position
-    m_linear_velocity += m_force * (float) (data.dt / m_mass);
-    m_position += m_linear_velocity * (float) data.dt;
-
-    // Rotation
-    m_angularMomentum += m_torque * (float) data.dt;
-    // ---
-    glm::mat3 rot = m_parentToLocal;
-    glm::mat3 rot_t = glm::transpose(rot);
-    glm::mat3 invI = rot * m_invIBody * rot_t;
-    glm::vec3 angular_velocity = invI * m_angularMomentum;
-    // ---
-    /*auto starMatrix = [](const glm::vec3& v) -> glm::mat3
-    {
-      return glm::mat3(
-        0.0, -v.z, v.y,
-        v.z, 0.0, -v.x,
-        -v.y, v.x, 0.0);
-    };
-    m_derived_rotation = starMatrix(glm::normalize(angular_velocity)) * m_rotation;*/
-    // ---
-    m_rotation += angular_velocity * (float) data.dt;
-  }
+    return glm::mat3(
+      0.0, -v.z, v.y,
+      v.z, 0.0, -v.x,
+      -v.y, v.x, 0.0);
+  };
+  m_derived_rotation = starMatrix(glm::normalize(angular_velocity)) * m_rotation;*/
+  // ---
+  m_rotation += angular_velocity * (float) data.dt;
 
   updateTransform();
   data.worldToLocal = data.worldToParent * m_parentToLocal;
@@ -718,4 +726,17 @@ void RigidBody::computeInertia()
   }
 
   m_invIBody = glm::inverse(body_inertia * pmass);
+}
+
+// ------------------------------------------------------------------------------------------------
+void RigidBody::removeImpulseForce()
+{
+  auto isImpulse = [](ExternalForce ea)
+  {
+    return (ea.mode == ForceMode::IMPULSE);
+  };
+  std::erase_if(m_external_forces, isImpulse);
+
+  // Recomputes Force & Torque
+  computeForceTorque();
 }

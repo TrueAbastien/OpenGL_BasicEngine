@@ -10,13 +10,24 @@
 
 #include "glError.hpp"
 
+// Collision Data Response ------------------------------------------------------------------------
+struct CollisionBodyData
+{
+  glm::vec3 worldPosition;
+  glm::vec3 normal;
+};
+using CollisionInternalResult = std::pair<CollisionBodyData, CollisionBodyData>;
+// - Optional on Collision (inexistant means no Collision
+using CollisionResult = std::optional<CollisionInternalResult>;
+// ------------------------------------------------------------------------------------------------
+
 // Forward Declaration
 class Renderer;
 class CollisionManager;
 class Physical;
 
 // Forward Inner Using (see. CollisionManager.hpp)
-using CurrentTargetCollisions = std::map<Physical*, std::pair<glm::vec3, glm::vec3>>;
+using CurrentTargetCollisions = std::map<Physical*, CollisionInternalResult>;
 
 // Vertex Data Content
 struct VertexType {
@@ -221,16 +232,16 @@ protected:
 class RigidBody final : public Component
 {
 public:
-  enum ForceReference
+  enum ForceMode
   {
-    LOCAL,
-    WORLD
+    CONTINUOUS,
+    IMPULSE
   };
   struct ExternalForce
   {
     glm::vec3 position;
     glm::vec3 force;
-    ForceReference type;
+    ForceMode mode = ForceMode::CONTINUOUS;
   };
 
 public:
@@ -238,6 +249,7 @@ public:
 
   // Returns the current amount of External Forces
   size_t addForce(const ExternalForce& force);
+  size_t addForces(const std::vector<ExternalForce>& forces);
   bool removeForce(size_t index);
 
   bool setMass(double mass);
@@ -252,6 +264,7 @@ private:
   void updateTransform();
   void computeForceTorque();
   void computeInertia();
+  void removeImpulseForce();
 
 protected:
   std::shared_ptr<Physical> m_target;
