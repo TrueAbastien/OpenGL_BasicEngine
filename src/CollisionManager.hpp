@@ -97,9 +97,9 @@ namespace CollisionUtils
   template <>
   inline CollisionResult internalCompute<Box, Box>(Box* body1, Box* body2)
   {
-    auto computeCollision = [](Box* target, Box* body) -> std::optional<glm::vec3>
+    auto isColliding = [](Box* target, Box* body) -> bool
     {
-      glm::vec3 miScale = target->getScale() / 2.0f;
+      glm::vec3 miScale = target->getScale() * 0.5f;
       glm::mat4 bodyLocal_2_TargetLocal = glm::inverse(target->worldToLocal()) * body->worldToLocal();
 
       const auto vertices = body->getVertices();
@@ -110,45 +110,44 @@ namespace CollisionUtils
             glm::abs(pos.y) < miScale.y &&
             glm::abs(pos.z) < miScale.z)
         {
-          glm::vec3 targetOrigin_inBody = glm::inverse(bodyLocal_2_TargetLocal) * glm::vec4(0.0, 0.0, 0.0, 1.0);
-          glm::vec3 miScale = body->getScale() * 0.5f;
-
-          float factor = std::min(
-            {
-              miScale.x / targetOrigin_inBody.x,
-              miScale.y / targetOrigin_inBody.y,
-              miScale.z / targetOrigin_inBody.z
-            });
-          return bodyLocal_2_TargetLocal * glm::vec4(targetOrigin_inBody * factor, 1.0);
+          return true;
         }
       }
 
-      return std::nullopt;
+      return false;
     };
 
-    auto res1 = computeCollision(body1, body2);
-    auto res2 = computeCollision(body2, body1);
+    auto closestPoint = [](Box* target, Box* body) -> glm::vec3
+    {
+      glm::mat4 bodyLocal_2_TargetLocal = glm::inverse(target->worldToLocal()) * body->worldToLocal();
 
-    if (!res1 && !res2) // No Collision
+      glm::vec3 targetOrigin_inBody = glm::inverse(bodyLocal_2_TargetLocal) * glm::vec4(0.0, 0.0, 0.0, 1.0);
+      glm::vec3 miScale = body->getScale() * 0.5f;
+
+      float factor = std::min(
+        {
+          miScale.x / targetOrigin_inBody.x,
+          miScale.y / targetOrigin_inBody.y,
+          miScale.z / targetOrigin_inBody.z
+        });
+
+      if (factor >= 1.0f)
+      {
+        return glm::vec3(0.0);
+      }
+
+      return bodyLocal_2_TargetLocal * glm::vec4(targetOrigin_inBody * factor, 1.0);
+    };
+
+    if (!isColliding(body1, body2) && !isColliding(body2, body1))
     {
       return std::nullopt;
     }
-    else if (!res1) // Body1 inside Body2
-    {
-      return std::make_pair(
-        glm::vec3(0),
-        *res2);
-    }
-    else if (!res2) // Body2 inside Body1
-    {
-      return std::make_pair(
-        *res1,
-        glm::vec3(0));
-    }
-    else // Classic Collision
-    {
-      return std::make_pair(*res1, *res2);
-    }
+
+    return std::make_pair(
+      closestPoint(body1, body2),
+      closestPoint(body2, body1)
+    );
   }
 }
 

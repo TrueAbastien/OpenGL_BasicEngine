@@ -70,8 +70,9 @@ PendulumApplication::PendulumApplication()
     m_scene->addChild(ground);
 
     auto box = std::make_shared<Box>(glm::vec3(1.0f, 1.0f, 1.0f));
-    auto rigidBody = std::make_shared<RigidBody>(box, 10.0);
+    box->setLocalModel(glm::vec3(0.0, 0.0, 30.0));
 
+    auto rigidBody = std::make_shared<RigidBody>(box, 10.0);
     rigidBody->addForce(RigidBody::ExternalForce // Gravity
                         {
                           glm::vec3(0.0, 0.0, 0.0), // Position

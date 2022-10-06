@@ -643,32 +643,40 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
   auto collisions = m_target->computeCollision(renderer->getCollisionManager().get());
   if (!collisions.empty())
   {
-    // TODO: better force computation
-    return;
+    for (const auto& collision : collisions)
+    {
+      glm::vec3 p1 = m_target->worldToLocal() * glm::vec4(collision.second.first, 1.0);
+      glm::vec3 p2 = collision.first->worldToLocal() * glm::vec4(collision.second.second, 1.0);
+
+      m_position += p2 - p1;
+    }
   }
 
-  // Position
-  m_linear_velocity += m_force * (float) (data.dt / m_mass);
-  m_position += m_linear_velocity * (float) data.dt;
-
-  // Rotation
-  m_angularMomentum += m_torque * (float) data.dt;
-  // ---
-  glm::mat3 rot = m_parentToLocal;
-  glm::mat3 rot_t = glm::transpose(rot);
-  glm::mat3 invI = rot * m_invIBody * rot_t;
-  glm::vec3 angular_velocity = invI * m_angularMomentum;
-  // ---
-  /*auto starMatrix = [](const glm::vec3& v) -> glm::mat3
+  else
   {
-    return glm::mat3(
-      0.0, -v.z, v.y,
-      v.z, 0.0, -v.x,
-      -v.y, v.x, 0.0);
-  };
-  m_derived_rotation = starMatrix(glm::normalize(angular_velocity)) * m_rotation;*/
-  // ---
-  m_rotation += angular_velocity * (float) data.dt; // TODO ?
+    // Position
+    m_linear_velocity += m_force * (float) (data.dt / m_mass);
+    m_position += m_linear_velocity * (float) data.dt;
+
+    // Rotation
+    m_angularMomentum += m_torque * (float) data.dt;
+    // ---
+    glm::mat3 rot = m_parentToLocal;
+    glm::mat3 rot_t = glm::transpose(rot);
+    glm::mat3 invI = rot * m_invIBody * rot_t;
+    glm::vec3 angular_velocity = invI * m_angularMomentum;
+    // ---
+    /*auto starMatrix = [](const glm::vec3& v) -> glm::mat3
+    {
+      return glm::mat3(
+        0.0, -v.z, v.y,
+        v.z, 0.0, -v.x,
+        -v.y, v.x, 0.0);
+    };
+    m_derived_rotation = starMatrix(glm::normalize(angular_velocity)) * m_rotation;*/
+    // ---
+    m_rotation += angular_velocity * (float) data.dt;
+  }
 
   updateTransform();
   data.worldToLocal = data.worldToParent * m_parentToLocal;
