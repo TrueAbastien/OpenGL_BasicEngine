@@ -12,6 +12,10 @@
 #include "asset.hpp"
 #include "glError.hpp"
 
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
+
 class PendulumComponent final : public Box
 {
 public:
@@ -49,6 +53,16 @@ PendulumApplication::PendulumApplication()
       m_scene(std::make_unique<Scene>())
 {
   glCheckError(__FILE__, __LINE__);
+
+  // Setup Dear ImGui context
+  IMGUI_CHECKVERSION();
+  ImGui::CreateContext();
+  ImGuiIO& io = ImGui::GetIO();
+  // Setup Platform/Renderer bindings
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+  ImGui_ImplOpenGL3_Init("#version 150");
+  // Setup Dear ImGui style
+  ImGui::StyleColorsDark();
 
   // Pendulum
   /*{
@@ -93,6 +107,11 @@ void PendulumApplication::loop() {
 
   float t = getTime();
 
+  // Imgui Loop
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+
   // set matrix : projection + view
   m_renderer->setProjection(glm::perspective(
       float(2.0 * atan(getHeight() / 1920.f)), getWindowRatio(), 0.1f, 100.f));
@@ -106,4 +125,9 @@ void PendulumApplication::loop() {
   data.dt = (double) getFrameDeltaTime();
   data.t = (double) getTime();
   m_renderer->update(m_scene.get(), data);
+
+  // Imgui Update
+  ImGui::ShowDemoWindow();
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }
