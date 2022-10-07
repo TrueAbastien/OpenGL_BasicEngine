@@ -9,4 +9,4 @@
 	url = https://github.com/g-truc/glm
 [submodule "lib/imgui"]
 	path = lib/imgui
-	url = https://github.com/ocornut/imgui
+	url = https://github.com/ocornut/imgui.git
