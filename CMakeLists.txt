@@ -30,14 +30,14 @@ add_subdirectory(lib/glfw EXCLUDE_FROM_ALL)
 add_subdirectory(lib/glew EXCLUDE_FROM_ALL)
 add_subdirectory(lib/glm EXCLUDE_FROM_ALL)
 
-include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindImguiTarget.cmake)
-target_link_libraries(IMGUI PRIVATE glfw)
+#include(${CMAKE_CURRENT_SOURCE_DIR}/cmake/FindImguiTarget.cmake)
+#target_link_libraries(IMGUI PRIVATE glfw)
 
 target_link_libraries(${proj}
   PRIVATE glfw
   PRIVATE libglew_static
   PRIVATE glm
-  PRIVATE IMGUI
+  #PRIVATE IMGUI
 )
 
 configure_file(

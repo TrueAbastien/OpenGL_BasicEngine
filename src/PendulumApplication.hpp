@@ -9,6 +9,7 @@
 class PendulumApplication : public Application {
  public:
   PendulumApplication();
+  ~PendulumApplication();
 
  protected:
   virtual void loop();
