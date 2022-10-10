@@ -12,9 +12,9 @@
 #include "asset.hpp"
 #include "glError.hpp"
 
-// #include "imgui.h"
-// #include "imgui_impl_glfw.h"
-// #include "imgui_impl_opengl3.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 class PendulumComponent final : public Box
 {
@@ -54,10 +54,14 @@ PendulumApplication::PendulumApplication()
 {
   glCheckError(__FILE__, __LINE__);
 
-  // ImGui::CreateContext();
-  // ImGui_ImplGlfw_InitForOpenGL(window, true);
-  // ImGui_ImplOpenGL3_Init();
-  // ImGui::StyleColorsDark();
+  ImGui::CreateContext();
+  ImGui_ImplGlfw_InitForOpenGL(window, true);
+
+  ImGuiIO& io = ImGui::GetIO();
+  io.ConfigFlags |= ImGuiConfigFlags_NavEnableSetMousePos;
+
+  ImGui_ImplOpenGL3_Init();
+  ImGui::StyleColorsDark();
 
   // Pendulum
   /*{
@@ -97,17 +101,15 @@ PendulumApplication::PendulumApplication()
 
 PendulumApplication::~PendulumApplication()
 {
-  /*ImGui_ImplOpenGL3_Shutdown();
+  ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
-  ImGui::DestroyContext();*/
+  ImGui::DestroyContext();
 }
 
 void PendulumApplication::loop() {
   // exit on window close button pressed
   if (glfwWindowShouldClose(getWindow()))
     exit();
-
-  float t = getTime();
 
   // set matrix : projection + view
   m_renderer->setProjection(glm::perspective(
@@ -118,17 +120,22 @@ void PendulumApplication::loop() {
   glClearColor(0.0, 0.0, 0.0, 0.0);
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+  // ImGui Init
+  ImGui_ImplOpenGL3_NewFrame();
+  ImGui_ImplGlfw_NewFrame();
+  ImGui::NewFrame();
+
   UpdateData data;
   data.dt = (double) getFrameDeltaTime();
   data.t = (double) getTime();
   m_renderer->update(m_scene.get(), data);
 
-  // ImGui_ImplOpenGL3_NewFrame();
-  // ImGui_ImplGlfw_NewFrame();
-  // ImGui::NewFrame();
+  {
+    // GUI Frame
+    ImGui::ShowDemoWindow();
+  }
 
-  // ImGui::ShowDemoWindow();
-
-  // ImGui::Render();
-  // ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+  // ImGui Render
+  ImGui::Render();
+  ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 }

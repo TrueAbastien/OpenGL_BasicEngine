@@ -46,17 +46,9 @@ namespace CollisionUtils
 
   // Variadic Casting -----------------------------------------------------------------------------
   template <PhysicalDerived TTarget>
-  inline CollisionResult physicalCastCompute(TTarget* target, Physical* body)
+  inline CollisionResult physicalCastCompute(TTarget*, Physical*)
   {
     return std::nullopt;
-  }
-
-  template <PhysicalDerived TTarget, PhysicalDerived TBody>
-  inline CollisionResult physicalCastCompute(TTarget* target, Physical* body)
-  {
-    auto result = dynamic_cast<TBody*>(body);
-    return (result == nullptr) ? std::nullopt
-      : compute<TTarget, TBody>(target, result);
   }
 
   template <PhysicalDerived TTarget, PhysicalDerived TBody, PhysicalDerived ...Types>

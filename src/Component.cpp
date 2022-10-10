@@ -14,6 +14,8 @@
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtx/transform.hpp>
 
+#include "imgui_impl_glfw.h"
+
 #include <algorithm>
 #include <iostream>
 #include <numeric>
@@ -31,20 +33,28 @@ namespace CameraDefinitions
 void mouseMoveCallback(GLFWwindow* window, double xpos, double ypos)
 {
   if (mainCamera) mainCamera->mouseMoveCallback(xpos, ypos);
+
+  // ImGui
+  ImGui_ImplGlfw_CursorPosCallback(window, xpos, ypos);
 }
 
 // ------------------------------------------------------------------------------------------------
 void mouseClickCallback(GLFWwindow* window, int button, int action, int mods)
 {
-  double xpos, ypos;
-  glfwGetCursorPos(window, &xpos, &ypos);
+  double xpos, ypos; glfwGetCursorPos(window, &xpos, &ypos);
   if (mainCamera) mainCamera->mouseClickCallback(button, action, xpos, ypos);
+
+  // ImGui
+  ImGui_ImplGlfw_MouseButtonCallback(window, button, action, mods);
 }
 
 // ------------------------------------------------------------------------------------------------
 void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 {
   if (mainCamera) mainCamera->scrollBack((float) yoffset);
+
+  // ImGui
+  ImGui_ImplGlfw_ScrollCallback(window, xoffset, yoffset);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -254,7 +264,7 @@ void Camera::mouseMoveCallback(double xpos, double ypos)
 // ------------------------------------------------------------------------------------------------
 void Camera::mouseClickCallback(int button, int action, double xpos, double ypos)
 {
-  if (button == GLFW_MOUSE_BUTTON_LEFT)
+  if (button == GLFW_MOUSE_BUTTON_RIGHT)
   {
     if (action == GLFW_PRESS)
     {
@@ -659,6 +669,8 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
     {
       m_position += collision.second.second.worldPosition - collision.second.first.worldPosition;
     }*/
+
+    return; // TEMP
 
     // TODO
   }
