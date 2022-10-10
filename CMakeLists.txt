@@ -3,24 +3,47 @@ cmake_minimum_required (VERSION 3.2)
 set (proj opengl-basic-engine)
 project (${proj})
 
-# The main executable
-add_executable(${proj}
-  src/Application.hpp
-  src/Application.cpp
-  src/PendulumApplication.hpp
-  src/PendulumApplication.cpp
-  src/glError.hpp
-  src/glError.cpp
-  src/main.cpp
-  src/Shader.hpp
-  src/Shader.cpp
-  src/Renderer.hpp
-  src/Renderer.cpp
-  src/Component.hpp
-  src/Component.cpp
-  src/CollisionManager.hpp
-  src/CollisionManager.cpp
+set(MAIN_SOURCES
+  Application.cpp
+  Application.hpp
+  CollisionManager.cpp
+  CollisionManager.hpp
+  glError.cpp
+  glError.hpp
+  main.cpp
+  PendulumApplication.cpp
+  PendulumApplication.hpp
+  Renderer.cpp
+  Renderer.hpp
+  Shader.cpp
+  Shader.hpp
+  StructInfo.hpp
 )
+list(TRANSFORM MAIN_SOURCES PREPEND "src/")
+
+set(COMPONENT_SOURCES
+  Box.cpp
+  Box.hpp
+  Camera.cpp
+  Camera.hpp
+  Component.cpp
+  Component.hpp
+  EmptyTransform.hpp
+  Meshable.cpp
+  Meshable.hpp
+  Physical.cpp
+  Physical.hpp
+  Renderable.cpp
+  Renderable.hpp
+  RigidBody.cpp
+  RigidBody.hpp
+  Scene.cpp
+  Scene.hpp
+)
+list(TRANSFORM COMPONENT_SOURCES PREPEND "src/components/")
+
+# The main executable
+add_executable(${proj} ${MAIN_SOURCES} ${COMPONENT_SOURCES})
 
 set_property(TARGET ${proj} PROPERTY CXX_STANDARD 20)
 target_compile_options(${proj} PRIVATE -Wall)

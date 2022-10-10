@@ -1,4 +1,3 @@
-
 #include "PendulumApplication.hpp"
 
 #include <GLFW/glfw3.h>
@@ -11,6 +10,9 @@
 
 #include "asset.hpp"
 #include "glError.hpp"
+
+#include "components/RigidBody.hpp"
+#include "components/Box.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"

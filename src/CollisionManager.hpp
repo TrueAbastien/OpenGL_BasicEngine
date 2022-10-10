@@ -1,12 +1,14 @@
-
 #pragma once
 
-#include "Component.hpp"
+#include "components/Physical.hpp"
+#include "components/Box.hpp"
 
+#include <algorithm>
+#include <vector>
+#include <numeric>
 #include <optional>
 #include <utility>
 #include <tuple>
-
 
 // ------------------------------------------------------------------------------------------------
 namespace CollisionUtils

@@ -1,9 +1,10 @@
 #pragma once
 
-#include "Component.hpp"
 #include "Application.hpp"
 #include "Shader.hpp"
 #include "CollisionManager.hpp"
+
+#include "components/Component.hpp"
 
 class Renderer final
 {

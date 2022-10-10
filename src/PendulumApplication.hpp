@@ -1,10 +1,11 @@
-
 #pragma once
 
 #include "Application.hpp"
 #include "Shader.hpp"
 #include "Renderer.hpp"
-#include "Component.hpp"
+
+#include "components/Component.hpp"
+#include "components/Scene.hpp"
 
 class PendulumApplication : public Application {
  public:
