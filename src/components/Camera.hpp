@@ -36,4 +36,4 @@ private:
   double m_lastY;
 };
 
-static Camera* mainCamera = nullptr;
+extern Camera* mainCamera;

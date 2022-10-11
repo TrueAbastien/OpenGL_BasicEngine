@@ -98,12 +98,14 @@ PendulumApplication::PendulumApplication()
     /*rigidBody->addForce(RigidBody::ExternalForce
                         {
                           glm::vec3(0.0, 0.5, 0.0),
-                          glm::vec3(10.0, 0.0, 0.0)
+                          glm::vec3(1e+9f, 0.0, 0.0),
+                          RigidBody::ForceMode::IMPULSE
                         });
     rigidBody->addForce(RigidBody::ExternalForce
                         {
                           glm::vec3(0.0, -0.5, 0.0),
-                          glm::vec3(-10.0, 0.0, 0.0)
+                          glm::vec3(-1e+9f, 0.0, 0.0),
+                          RigidBody::ForceMode::IMPULSE
                         });*/
 
     m_scene->addChild(rigidBody);
@@ -145,7 +147,7 @@ void PendulumApplication::loop() {
 
   {
     // GUI Frame
-    //ImGui::ShowDemoWindow();
+    ImGui::ShowDemoWindow();
   }
 
   // ImGui Render

@@ -107,10 +107,10 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
   auto collisions = m_target->computeCollision(renderer->getCollisionManager().get());
   if (!collisions.empty())
   {
-    /*for (const auto& collision : collisions)
+    for (const auto& collision : collisions)
     {
       m_position += collision.second.second.worldPosition - collision.second.first.worldPosition;
-    }*/
+    }
 
     return; // TEMP
 
@@ -142,6 +142,9 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
 
   updateTransform();
   data.worldToLocal = data.worldToParent * m_parentToLocal;
+
+  // Recomputes Force & Torque
+  computeForceTorque();
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -190,7 +193,4 @@ void RigidBody::removeImpulseForce()
     return (ea.mode == ForceMode::IMPULSE);
   };
   std::erase_if(m_external_forces, isImpulse);
-
-  // Recomputes Force & Torque
-  computeForceTorque();
 }

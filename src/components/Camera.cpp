@@ -13,6 +13,8 @@
 
 #include "Renderer.hpp"
 
+Camera* mainCamera = nullptr;
+
 // ------------------------------------------------------------------------------------------------
 namespace CameraDefinitions
 {

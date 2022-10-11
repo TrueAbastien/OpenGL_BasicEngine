@@ -15,7 +15,4 @@ protected:
 
 public:
   virtual CurrentTargetCollisions computeCollision(CollisionManager* colMan) = 0;
-
-private:
-  //Renderer* m_rendererRef;
 };
