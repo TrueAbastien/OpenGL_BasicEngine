@@ -27,7 +27,7 @@ void Component::setLocalModel(const glm::vec3& trsl, const glm::vec3& rot)
   glm::mat4 tr = glm::rotate(rot.x, glm::vec3(1.0, 0.0, 0.0)) *
                  glm::rotate(rot.y, glm::vec3(0.0, 1.0, 0.0)) *
                  glm::rotate(rot.z, glm::vec3(0.0, 0.0, 1.0));
-  m_parentToLocal = glm::translate(tr, trsl);
+  m_parentToLocal = glm::translate(glm::mat4(1.0), trsl) * tr;
 }
 
 // ------------------------------------------------------------------------------------------------

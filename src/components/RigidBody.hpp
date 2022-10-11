@@ -28,6 +28,9 @@ public:
   bool setMass(double mass);
   double getMass() const;
 
+  void translateBy(const glm::vec3& trsl);
+  void rotateBy(const glm::vec3& rot);
+
 protected:
   void initialize(Renderer* renderer) override;
 

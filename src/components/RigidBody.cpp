@@ -75,6 +75,18 @@ double RigidBody::getMass() const
 }
 
 // ------------------------------------------------------------------------------------------------
+void RigidBody::translateBy(const glm::vec3& trsl)
+{
+  m_position += trsl;
+}
+
+// ------------------------------------------------------------------------------------------------
+void RigidBody::rotateBy(const glm::vec3& rot)
+{
+  m_rotation += rot;
+}
+
+// ------------------------------------------------------------------------------------------------
 void RigidBody::initialize(Renderer* renderer)
 {
   for (auto& child : m_children)
