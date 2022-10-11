@@ -81,11 +81,11 @@ PendulumApplication::PendulumApplication()
   // RigidBody
   {
     auto ground = std::make_shared<Box>(glm::vec3(10.0, 10.0, 1.0));
-    ground->setLocalModel(glm::vec3(0.0, 0.0, -3.0));
-    m_scene->addChild(ground);
+    auto wrapper = std::make_shared<RigidBody>(ground, 1e+6);
+    wrapper->translateBy(glm::vec3(0.0, 0.0, -3.0));
+    m_scene->addChild(wrapper);
 
     auto box = std::make_shared<Box>(glm::vec3(1.0f, 1.0f, 1.0f));
-
     auto rigidBody = std::make_shared<RigidBody>(box, 10.0);
     rigidBody->translateBy(glm::vec3(0.0, 0.0, 5.0));
 
@@ -98,18 +98,41 @@ PendulumApplication::PendulumApplication()
     /*rigidBody->addForce(RigidBody::ExternalForce
                         {
                           glm::vec3(0.0, 0.5, 0.0),
-                          glm::vec3(1e+9f, 0.0, 0.0),
-                          RigidBody::ForceMode::IMPULSE
+                          glm::vec3(10.0, 0.0, 0.0)
                         });
     rigidBody->addForce(RigidBody::ExternalForce
                         {
                           glm::vec3(0.0, -0.5, 0.0),
-                          glm::vec3(-1e+9f, 0.0, 0.0),
-                          RigidBody::ForceMode::IMPULSE
+                          glm::vec3(-10.0, 0.0, 0.0)
                         });*/
 
     m_scene->addChild(rigidBody);
   }
+
+  // Spring
+  /*{
+    float force = 1e+8f;
+
+    auto cube1 = std::make_shared<Box>(glm::vec3(1.0));
+    auto rb1 = std::make_shared<RigidBody>(cube1, 10.0);
+    rb1->translateBy(glm::vec3(0.0, -10.0, 0.0));
+    rb1->addForce(RigidBody::ExternalForce
+    (
+      glm::vec3(0.0), glm::vec3(0.0, force, 0.0),
+      RigidBody::ForceMode::IMPULSE
+    ));
+    m_scene->addChild(rb1);
+
+    auto cube2 = std::make_shared<Box>(glm::vec3(1.0));
+    auto rb2 = std::make_shared<RigidBody>(cube2, 10.0);
+    rb2->translateBy(glm::vec3(0.0, 10.0, 0.0));
+    rb2->addForce(RigidBody::ExternalForce
+    (
+      glm::vec3(0.0), glm::vec3(0.0, -force, 0.0),
+      RigidBody::ForceMode::IMPULSE
+    ));
+    m_scene->addChild(rb2);
+  }*/
 
   m_renderer->start(m_scene.get());
 }
@@ -147,7 +170,7 @@ void PendulumApplication::loop() {
 
   {
     // GUI Frame
-    ImGui::ShowDemoWindow();
+    //ImGui::ShowDemoWindow();
   }
 
   // ImGui Render

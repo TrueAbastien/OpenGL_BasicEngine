@@ -2,6 +2,7 @@
 
 #include "Physical.hpp"
 #include "Renderer.hpp"
+#include "RigidBody.hpp"
 
 #include <numeric>
 #include <algorithm>
@@ -20,6 +21,8 @@ RigidBody::RigidBody(const std::shared_ptr<Physical>& target, double mass)
   }
 
   addChild(target);
+
+  target->setRigidBody(this);
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -107,14 +110,50 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
   auto collisions = m_target->computeCollision(renderer->getCollisionManager().get());
   if (!collisions.empty())
   {
-    for (const auto& collision : collisions)
+    /*for (const auto& collision : collisions)
     {
       m_position += collision.second.second.worldPosition - collision.second.first.worldPosition;
+    }*/
+
+    // Only One Collision
+    auto result = *(collisions.begin());
+
+    if (result.first->hasBody() && m_target->hasBody())
+    {
+      auto rb1 = m_target->getRigidBody();
+      auto rb2 = result.first->getRigidBody();
+
+      float rb1_velocity = glm::dot(rb1->m_linear_velocity, result.second.first.normal);
+      float rb2_velocity = glm::dot(rb2->m_linear_velocity, result.second.second.normal);
+
+      float v1 = (
+        rb1_velocity * (float) rb1->m_mass +
+        rb2_velocity * (float) rb2->m_mass +
+        (rb2_velocity - rb1_velocity) * (float) rb2->m_mass) /
+        ((float) rb1->m_mass + rb2->m_mass);
+
+      float v2 = (
+        rb1_velocity * (float) rb1->m_mass +
+        rb2_velocity * (float) rb2->m_mass +
+        (rb1_velocity - rb2_velocity) * (float) rb1->m_mass) /
+        ((float) rb1->m_mass + rb2->m_mass);
+
+      auto reflect = [&](glm::vec3 dir, glm::vec3 normal, float velocity) -> glm::vec3
+      {
+        if (dir == glm::vec3(0.0))
+        {
+          return glm::vec3(0.0);
+        }
+
+        glm::vec3 d = glm::normalize(dir);
+        return (2.0f * glm::dot(normal, -d) * normal + d) * velocity;
+      };
+
+      rb1->m_linear_velocity = reflect(rb1->m_linear_velocity, result.second.first.normal, v1);
+      rb2->m_linear_velocity = reflect(rb2->m_linear_velocity, result.second.second.normal, v2);
     }
 
-    return; // TEMP
-
-    // TODO
+    // TODO: better implementation
   }
 
   // Position

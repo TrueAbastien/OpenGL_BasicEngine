@@ -13,13 +13,14 @@ struct CollisionBodyData
   glm::vec3 normal;
 };
 using CollisionInternalResult = std::pair<CollisionBodyData, CollisionBodyData>;
-// - Optional on Collision (inexistant means no Collision
+// - Optional on Collision (inexistant means no Collision)
 using CollisionResult = std::optional<CollisionInternalResult>;
 
 // Forward Declaration
 class Renderer;
 class CollisionManager;
 class Physical;
+class RigidBody;
 
 // Forward Inner Using (see. CollisionManager.hpp)
 using CurrentTargetCollisions = std::map<Physical*, CollisionInternalResult>;

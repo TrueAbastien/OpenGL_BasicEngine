@@ -5,7 +5,7 @@
 
 // ------------------------------------------------------------------------------------------------
 Physical::Physical()
-  : Meshable()//, m_rendererRef(nullptr)
+  : Meshable(), m_body(nullptr)
 {
 }
 
@@ -13,14 +13,28 @@ Physical::Physical()
 Physical::~Physical()
 {
   // TODO: remove Physical on destruction
-  // 
-  //m_rendererRef->getCollisionManager()->removePhysical(this);
+}
+
+// ------------------------------------------------------------------------------------------------
+RigidBody* Physical::getRigidBody() const
+{
+  return m_body;
+}
+
+// ------------------------------------------------------------------------------------------------
+bool Physical::hasBody() const
+{
+  return (m_body != nullptr);
 }
 
 // ------------------------------------------------------------------------------------------------
 void Physical::beforeInitialize(Renderer* renderer)
 {
-  //m_rendererRef = renderer;
-
   renderer->getCollisionManager()->addPhysical(this);
+}
+
+// ------------------------------------------------------------------------------------------------
+void Physical::setRigidBody(RigidBody* body)
+{
+  m_body = body;
 }
