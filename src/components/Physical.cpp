@@ -4,9 +4,15 @@
 #include "CollisionManager.hpp"
 
 // ------------------------------------------------------------------------------------------------
-Physical::Physical()
+Physical::Physical(const std::shared_ptr<Meshable>& target)
   : Meshable(), m_body(nullptr)
 {
+  if (target == nullptr)
+  {
+    return;
+  }
+
+  addChild(target);
 }
 
 // ------------------------------------------------------------------------------------------------

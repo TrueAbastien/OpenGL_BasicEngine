@@ -5,7 +5,7 @@
 
 // ------------------------------------------------------------------------------------------------
 Box::Box(glm::vec3 scale)
-  : Physical(), m_scale(scale)
+  : Physical(nullptr), m_scale(scale)
 {
 }
 

@@ -93,9 +93,9 @@ namespace CollisionUtils
       for (const auto& vertex : vertices)
       {
         glm::vec3 pos = bodyLocal_2_TargetLocal * glm::vec4(vertex.position, 1.0);
-        if (glm::abs(pos.x) < miScale.x &&
-            glm::abs(pos.y) < miScale.y &&
-            glm::abs(pos.z) < miScale.z)
+        if (glm::abs(pos.x) <= miScale.x &&
+            glm::abs(pos.y) <= miScale.y &&
+            glm::abs(pos.z) <= miScale.z)
         {
           return true;
         }

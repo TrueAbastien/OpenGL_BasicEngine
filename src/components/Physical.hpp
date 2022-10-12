@@ -8,7 +8,7 @@ public:
   friend RigidBody;
 
 protected:
-  Physical();
+  Physical(const std::shared_ptr<Meshable>& target);
 
 public:
   virtual ~Physical();

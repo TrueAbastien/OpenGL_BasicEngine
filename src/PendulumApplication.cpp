@@ -86,7 +86,7 @@ PendulumApplication::PendulumApplication()
     m_scene->addChild(wrapper);
 
     auto box = std::make_shared<Box>(glm::vec3(1.0f, 1.0f, 1.0f));
-    auto rigidBody = std::make_shared<RigidBody>(box, 10.0, 0.8);
+    auto rigidBody = std::make_shared<RigidBody>(box, 10.0, 0.99);
     rigidBody->translateBy(glm::vec3(0.0, 0.0, 5.0));
 
     rigidBody->addForce(RigidBody::ExternalForce // Gravity
@@ -95,41 +95,29 @@ PendulumApplication::PendulumApplication()
                           glm::vec3(0.0, 0.0, -9.81) // Force
                           * rigidBody->getMass()
                         });
-    /*rigidBody->addForce(RigidBody::ExternalForce
-                        {
-                          glm::vec3(0.0, 0.5, 0.0),
-                          glm::vec3(10.0, 0.0, 0.0)
-                        });
-    rigidBody->addForce(RigidBody::ExternalForce
-                        {
-                          glm::vec3(0.0, -0.5, 0.0),
-                          glm::vec3(-10.0, 0.0, 0.0)
-                        });*/
 
     m_scene->addChild(rigidBody);
   }
 
   // Spring
   /*{
-    float force = 1e+8f;
+    float force = 10.0f;
 
     auto cube1 = std::make_shared<Box>(glm::vec3(1.0));
-    auto rb1 = std::make_shared<RigidBody>(cube1, 10.0);
+    auto rb1 = std::make_shared<RigidBody>(cube1, 10.0, 1.0);
     rb1->translateBy(glm::vec3(0.0, -10.0, 0.0));
     rb1->addForce(RigidBody::ExternalForce
     (
-      glm::vec3(0.0), glm::vec3(0.0, force, 0.0),
-      RigidBody::ForceMode::IMPULSE
+      glm::vec3(0.0), glm::vec3(0.0, force, 0.0)
     ));
     m_scene->addChild(rb1);
 
     auto cube2 = std::make_shared<Box>(glm::vec3(1.0));
-    auto rb2 = std::make_shared<RigidBody>(cube2, 10.0);
+    auto rb2 = std::make_shared<RigidBody>(cube2, 10.0, 1.0);
     rb2->translateBy(glm::vec3(0.0, 10.0, 0.0));
     rb2->addForce(RigidBody::ExternalForce
     (
-      glm::vec3(0.0), glm::vec3(0.0, -force, 0.0),
-      RigidBody::ForceMode::IMPULSE
+      glm::vec3(0.0), glm::vec3(0.0, -force, 0.0)
     ));
     m_scene->addChild(rb2);
   }*/

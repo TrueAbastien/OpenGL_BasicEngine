@@ -24,6 +24,8 @@ list(TRANSFORM MAIN_SOURCES PREPEND "src/")
 set(COMPONENT_SOURCES
   Box.cpp
   Box.hpp
+  BoxCollider.cpp
+  BoxCollider.hpp
   Camera.cpp
   Camera.hpp
   Component.cpp
