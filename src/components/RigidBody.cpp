@@ -8,13 +8,16 @@
 #include <algorithm>
 
 // ------------------------------------------------------------------------------------------------
-RigidBody::RigidBody(const std::shared_ptr<Physical>& target, double mass)
-  : m_target(target), m_mass(mass),
+RigidBody::RigidBody(const std::shared_ptr<Physical>& target, float mass, float elasticity)
+  : m_target(target), m_mass(1.0), m_elasticity(0.0),
   m_position(glm::vec3(0.0)), m_rotation(glm::vec3(0.0)),
   m_linear_velocity(glm::vec3(0.0)), //m_derived_rotation(glm::mat3(0.0)),
   m_angularMomentum(glm::vec3(0.0)),
   m_force(glm::vec3(0.0)), m_torque(glm::vec3(0.0))
 {
+  setMass(mass);
+  setElasticity(elasticity);
+
   if (target == nullptr)
   {
     return;
@@ -58,7 +61,7 @@ bool RigidBody::removeForce(size_t index)
 }
 
 // ------------------------------------------------------------------------------------------------
-bool RigidBody::setMass(double mass)
+bool RigidBody::setMass(float mass)
 {
   if (mass <= 0.0)
   {
@@ -72,9 +75,28 @@ bool RigidBody::setMass(double mass)
 }
 
 // ------------------------------------------------------------------------------------------------
-double RigidBody::getMass() const
+float RigidBody::getMass() const
 {
   return m_mass;
+}
+
+// ------------------------------------------------------------------------------------------------
+bool RigidBody::setElasticity(float elasticity)
+{
+  if (elasticity < 0.0)
+  {
+    return false;
+  }
+
+  m_elasticity = elasticity;
+
+  return true;
+}
+
+// ------------------------------------------------------------------------------------------------
+float RigidBody::getElasticity() const
+{
+  return m_elasticity;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -127,16 +149,16 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
       float rb2_velocity = glm::dot(rb2->m_linear_velocity, result.second.second.normal);
 
       float v1 = (
-        rb1_velocity * (float) rb1->m_mass +
-        rb2_velocity * (float) rb2->m_mass +
-        (rb2_velocity - rb1_velocity) * (float) rb2->m_mass) /
-        ((float) rb1->m_mass + rb2->m_mass);
+        rb1_velocity * rb1->m_mass +
+        rb2_velocity * rb2->m_mass +
+        (rb2_velocity - rb1_velocity) * rb2->m_mass * rb1->m_elasticity) /
+        (rb1->m_mass + rb2->m_mass);
 
       float v2 = (
-        rb1_velocity * (float) rb1->m_mass +
-        rb2_velocity * (float) rb2->m_mass +
-        (rb1_velocity - rb2_velocity) * (float) rb1->m_mass) /
-        ((float) rb1->m_mass + rb2->m_mass);
+        rb1_velocity * rb1->m_mass +
+        rb2_velocity * rb2->m_mass +
+        (rb1_velocity - rb2_velocity) * rb1->m_mass * rb2->m_elasticity) /
+        (rb1->m_mass + rb2->m_mass);
 
       auto reflect = [&](glm::vec3 dir, glm::vec3 normal, float velocity) -> glm::vec3
       {
@@ -212,13 +234,13 @@ void RigidBody::computeForceTorque()
 void RigidBody::computeInertia()
 {
   auto vertices = m_target->getVertices();
-  float pmass = (float) m_mass / vertices.size();
+  float pmass = m_mass / vertices.size();
 
   glm::mat3 body_inertia(0.0f);
   for (const auto& vertex : vertices)
   {
     glm::mat3 m = glm::outerProduct(vertex.position, vertex.position);
-    body_inertia += glm::dot(vertex.position, vertex.position) * glm::mat3() - m;
+    body_inertia += glm::dot(vertex.position, vertex.position) * glm::mat3(1.0) - m;
   }
 
   m_invIBody = glm::inverse(body_inertia * pmass);
