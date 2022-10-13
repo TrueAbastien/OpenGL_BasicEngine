@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Renderable.hpp"
+#include "builders/Builder.hpp"
 
 class Meshable : public Renderable
 {
@@ -8,10 +9,10 @@ protected:
   Meshable();
 
 protected:
-  void initializeRenderable(std::vector<VertexType> vertices, std::vector<GLuint> index) override;
+  void makeMesh(const Builder::Result& content);
 
 public:
-  void updateMesh();
+  void initializeMesh();
 
   std::vector<VertexType> getVertices() const;
   std::vector<GLuint> getIndexes() const;

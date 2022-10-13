@@ -21,6 +21,13 @@ set(MAIN_SOURCES
 )
 list(TRANSFORM MAIN_SOURCES PREPEND "src/")
 
+set(BUILDER_SOURCES
+  Builder.hpp
+  BoxBuilder.cpp
+  BoxBuilder.hpp
+)
+list(TRANSFORM BUILDER_SOURCES PREPEND "src/builders/")
+
 set(COMPONENT_SOURCES
   Box.cpp
   Box.hpp
@@ -45,7 +52,7 @@ set(COMPONENT_SOURCES
 list(TRANSFORM COMPONENT_SOURCES PREPEND "src/components/")
 
 # The main executable
-add_executable(${proj} ${MAIN_SOURCES} ${COMPONENT_SOURCES})
+add_executable(${proj} ${MAIN_SOURCES} ${BUILDER_SOURCES} ${COMPONENT_SOURCES})
 
 set_property(TARGET ${proj} PROPERTY CXX_STANDARD 20)
 target_compile_options(${proj} PRIVATE -Wall)

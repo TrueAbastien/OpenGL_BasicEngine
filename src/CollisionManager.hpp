@@ -1,7 +1,7 @@
 #pragma once
 
 #include "components/Physical.hpp"
-#include "components/Box.hpp"
+#include "components/BoxCollider.hpp"
 
 #include <algorithm>
 #include <vector>
@@ -68,7 +68,7 @@ namespace CollisionUtils
     return physicalCastCompute<T,
 
       // List of all Physicals
-      Box
+      BoxCollider
       // TO COMPLETE
 
     >(target, body);
@@ -76,15 +76,15 @@ namespace CollisionUtils
 
   // Box Definitions ------------------------------------------------------------------------------
   template <>
-  inline int priority<Box>()
+  inline int priority<BoxCollider>()
   {
     return 0;
   }
 
   template <>
-  inline CollisionResult internalCompute<Box, Box>(Box* body1, Box* body2)
+  inline CollisionResult internalCompute<BoxCollider, BoxCollider>(BoxCollider* body1, BoxCollider* body2)
   {
-    auto isColliding = [](Box* target, Box* body) -> bool
+    auto isColliding = [](BoxCollider* target, BoxCollider* body) -> bool
     {
       glm::vec3 miScale = target->getScale() * 0.5f;
       glm::mat4 bodyLocal_2_TargetLocal = glm::inverse(target->worldToLocal()) * body->worldToLocal();
@@ -104,7 +104,7 @@ namespace CollisionUtils
       return false;
     };
 
-    auto closestPoint = [](Box* target, Box* body) -> CollisionBodyData
+    auto closestPoint = [](BoxCollider* target, BoxCollider* body) -> CollisionBodyData
     {
       glm::mat4 target_World2Local = target->worldToLocal();
       glm::mat4 body_World2Local = body->worldToLocal();

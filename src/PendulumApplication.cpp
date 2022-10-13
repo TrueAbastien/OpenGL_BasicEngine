@@ -80,12 +80,14 @@ PendulumApplication::PendulumApplication()
 
   // RigidBody
   {
-    auto ground = std::make_shared<Box>(glm::vec3(10.0, 10.0, 1.0));
+    auto ground = std::make_shared<BoxCollider>(
+      std::make_shared<Box>(glm::vec3(10.0, 10.0, 1.0)));
     auto wrapper = std::make_shared<RigidBody>(ground, 1e+6, 0.0);
     wrapper->translateBy(glm::vec3(0.0, 0.0, -3.0));
     m_scene->addChild(wrapper);
 
-    auto box = std::make_shared<Box>(glm::vec3(1.0f, 1.0f, 1.0f));
+    auto box = std::make_shared<BoxCollider>(
+      std::make_shared<Box>(glm::vec3(1.0f, 1.0f, 1.0f)));
     auto rigidBody = std::make_shared<RigidBody>(box, 10.0, 0.99);
     rigidBody->translateBy(glm::vec3(0.0, 0.0, 5.0));
 

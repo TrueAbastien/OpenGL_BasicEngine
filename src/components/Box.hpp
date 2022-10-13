@@ -1,20 +1,14 @@
 #pragma once
 
-#include "Physical.hpp"
+#include "Meshable.hpp"
+#include "builders/BoxBuilder.hpp"
 
-class Box : public Physical
+class Box : public Meshable, public BoxBuilder
 {
 public:
   Box(glm::vec3 scale);
 
-  glm::vec3 getScale() const;
-
-  CurrentTargetCollisions computeCollision(CollisionManager* colMan) override;
-
 protected:
   void beforeInitialize(Renderer* renderer) override;
   void beforeUpdate(Renderer* renderer, UpdateData& data) override;
-
-protected:
-  glm::vec3 m_scale;
 };

@@ -3,17 +3,15 @@
 // ------------------------------------------------------------------------------------------------
 Meshable::Meshable()
   : m_vertices(0),
-    m_indexes(0)
+  m_indexes(0)
 {
 }
 
 // ------------------------------------------------------------------------------------------------
-void Meshable::initializeRenderable(std::vector<VertexType> vertices, std::vector<GLuint> index)
+void Meshable::makeMesh(const Builder::Result& content)
 {
-  m_vertices = std::move(vertices);
-  m_indexes = std::move(index);
-
-  Meshable::updateMesh();
+  m_vertices = content.vertices;
+  m_indexes = content.indexes;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -29,7 +27,7 @@ std::vector<GLuint> Meshable::getIndexes() const
 }
 
 // ------------------------------------------------------------------------------------------------
-void Meshable::updateMesh()
+void Meshable::initializeMesh()
 {
   if (m_vertices.empty() || m_indexes.empty())
   {

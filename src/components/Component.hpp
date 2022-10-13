@@ -12,12 +12,12 @@
 
 class Component
 {
- public:
-   using Pointer = std::shared_ptr<Component>;
-   using Collection = std::vector<Pointer>;
-   using UPointer = std::unique_ptr<Component>;
+public:
+  using Pointer = std::shared_ptr<Component>;
+  using Collection = std::vector<Pointer>;
+  using UPointer = std::unique_ptr<Component>;
 
- public:
+public:
   void setLocalModel(const glm::mat4& model);
   void setLocalModel(const glm::vec3& trsl = glm::vec3(),
                      const glm::vec3& rot = glm::vec3());
