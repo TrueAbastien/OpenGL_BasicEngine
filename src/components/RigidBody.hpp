@@ -5,6 +5,9 @@
 class RigidBody final : public Component
 {
 public:
+  friend CollisionDetector;
+
+public:
   enum ForceMode
   {
     CONTINUOUS,

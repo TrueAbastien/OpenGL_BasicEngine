@@ -6,7 +6,7 @@
 class Scene final : public Component
 {
 public:
-  Scene();
+  Scene(Renderer* renderer);
 
 protected:
   void beforeInitialize(Renderer* renderer) override;

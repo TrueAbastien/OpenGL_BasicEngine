@@ -49,7 +49,7 @@ BoxCollider::BoxCollider(const std::shared_ptr<Meshable>& target)
 // ------------------------------------------------------------------------------------------------
 CurrentTargetCollisions BoxCollider::computeCollision(CollisionManager* colMan)
 {
-  return colMan->computeCollision(this);
+  return colMan->computeTargetCollisions(this);
 }
 
 // ------------------------------------------------------------------------------------------------

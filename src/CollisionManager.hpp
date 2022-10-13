@@ -158,6 +158,7 @@ class CollisionManager final
 {
 public:
   using Result = std::map<Physical*, CollisionInternalResult>;
+  using ResultMap = std::map<Physical*, Result>;
 
 public:
   CollisionManager();
@@ -166,18 +167,18 @@ public:
   bool removePhysical(Physical* physical);
 
   template <CollisionUtils::PhysicalDerived T>
-  Result computeCollision(T* target);
+  Result computeTargetCollisions(T* target);
 
-  void clearCache();
+  ResultMap computeAllCollisions();
 
 private:
   std::vector<Physical*> m_colliders;
-  std::map<Physical*, Result> m_cachedResults;
+  ResultMap m_cachedResults;
 };
 
 // ------------------------------------------------------------------------------------------------
 template<CollisionUtils::PhysicalDerived T>
-inline CollisionManager::Result CollisionManager::computeCollision(T* target)
+inline CollisionManager::Result CollisionManager::computeTargetCollisions(T* target)
 {
   Result result;
 

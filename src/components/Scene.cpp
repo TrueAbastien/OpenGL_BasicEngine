@@ -1,6 +1,7 @@
 #include "Scene.hpp"
 
 #include "Camera.hpp"
+#include "CollisionDetector.hpp"
 #include "Renderer.hpp"
 
 #include "imgui_impl_glfw.h"
@@ -37,9 +38,10 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 }
 
 // ------------------------------------------------------------------------------------------------
-Scene::Scene()
+Scene::Scene(Renderer* renderer)
 {
   addChild(std::make_shared<Camera>());
+  addChild(std::make_shared<CollisionDetector>(renderer->getCollisionManager().get()));
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -58,5 +60,4 @@ void Scene::beforeInitialize(Renderer* renderer)
 // ------------------------------------------------------------------------------------------------
 void Scene::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
-  renderer->getCollisionManager()->clearCache();
 }

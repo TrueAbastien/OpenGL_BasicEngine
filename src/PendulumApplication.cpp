@@ -50,10 +50,11 @@ private:
 };
 
 PendulumApplication::PendulumApplication()
-    : Application(),
-      m_renderer(std::make_unique<Renderer>(window)),
-      m_scene(std::make_unique<Scene>())
+    : Application()
 {
+  m_renderer = std::make_unique<Renderer>(window);
+  m_scene = std::make_unique<Scene>(m_renderer.get());
+
   glCheckError(__FILE__, __LINE__);
 
   ImGui::CreateContext();
