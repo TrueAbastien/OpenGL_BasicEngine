@@ -13,7 +13,7 @@ glm::vec3 BoxBuilder::getScale() const
 }
 
 // ------------------------------------------------------------------------------------------------
-Builder::Result BoxBuilder::makeMeshContent() const
+Builder::Result BoxBuilder::makeMeshContent(ColorationMethod coloration) const
 {
   Builder::Result result;
 
@@ -26,12 +26,13 @@ Builder::Result BoxBuilder::makeMeshContent() const
   // C ----- D      Z
 
   glm::vec3 v = m_scale * 0.5f;
-  auto makeVertex = [](const glm::vec3& pos) -> VertexType
+  auto makeVertex = [coloration](const glm::vec3& pos) -> VertexType
   {
-    return {pos, glm::normalize(pos),
-            glm::vec4(pos.x < 0 ? 1.0 : 0.5, pos.y < 0 ? 1.0 : 0.5,
-                      pos.z < 0 ? 1.0 : 0.5, 1.0)};
+    VertexType vt = {pos, glm::normalize(pos)};
+    vt.color = coloration(vt);
+    return vt;
   };
+  
   result.vertices.push_back(makeVertex(glm::vec3(-v.x, -v.y, -v.z))); // A: 0
   result.vertices.push_back(makeVertex(glm::vec3(+v.x, -v.y, -v.z))); // B: 1
   result.vertices.push_back(makeVertex(glm::vec3(-v.x, -v.y, +v.z))); // C: 2

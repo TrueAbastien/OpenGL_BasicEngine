@@ -85,6 +85,7 @@ PendulumApplication::PendulumApplication()
       std::make_shared<Box>(glm::vec3(10.0, 10.0, 1.0)));
     auto wrapper = std::make_shared<RigidBody>(ground, 300.0, 0.0);
     wrapper->translateBy(glm::vec3(0.0, 0.0, -3.0));
+    //wrapper->rotateBy(glm::vec3(glm::pi<float>() * 0.15f, 0.0, 0.0));
     m_scene->addChild(wrapper);
 
     auto box = std::make_shared<BoxCollider>(
@@ -94,7 +95,7 @@ PendulumApplication::PendulumApplication()
 
     rigidBody->addForce(RigidBody::ExternalForce // Gravity
                         {
-                          glm::vec3(0.0, 0.0, 0.5), // Position
+                          glm::vec3(0.0, 0.0, 0.0), // Position
                           glm::vec3(0.0, 0.0, -9.81) // Force
                           * rigidBody->getMass()
                         });

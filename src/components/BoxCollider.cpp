@@ -7,7 +7,7 @@
 
 // ------------------------------------------------------------------------------------------------
 BoxCollider::BoxCollider(const std::shared_ptr<Meshable>& target)
-  : Physical(target), BoxBuilder(glm::vec3(0.0))
+  : Physical(target), WFBoxBuilder(glm::vec3(0.0))
 {
   if (target == nullptr)
   {
@@ -43,7 +43,12 @@ BoxCollider::BoxCollider(const std::shared_ptr<Meshable>& target)
   m_parentToLocal = glm::translate(target->getLocalModel(), offset);
   target->setLocalModel(glm::mat4(1.0));
 
-  Meshable::makeMesh(makeMeshContent());
+  Meshable::makeMesh(makeMeshContent(
+    [](auto)
+    {
+      return glm::vec4(0.0, 1.0, 0.0, 0.1);
+    }
+  ));
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -64,6 +69,6 @@ void BoxCollider::beforeInitialize(Renderer* renderer)
 void BoxCollider::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
   Meshable::updateRenderable(renderer, data.worldToLocal,
-                             6 * // Face on Cube
-                             2); // Triangle per Face
+                             12 * // Lines on Cube
+                             2);  // Values amount
 }

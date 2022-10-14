@@ -25,6 +25,8 @@ set(BUILDER_SOURCES
   Builder.hpp
   BoxBuilder.cpp
   BoxBuilder.hpp
+  WFBoxBuilder.cpp
+  WFBoxBuilder.hpp
 )
 list(TRANSFORM BUILDER_SOURCES PREPEND "src/builders/")
 

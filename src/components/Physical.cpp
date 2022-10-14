@@ -7,6 +7,8 @@
 Physical::Physical(const std::shared_ptr<Meshable>& target)
   : Meshable(), m_body(nullptr)
 {
+  Renderable::mode = GL_LINES;
+
   if (target == nullptr)
   {
     return;

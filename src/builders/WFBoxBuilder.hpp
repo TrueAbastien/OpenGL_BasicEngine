@@ -2,10 +2,10 @@
 
 #include "Builder.hpp"
 
-class BoxBuilder : public Builder
+class WFBoxBuilder : public Builder
 {
 protected:
-  BoxBuilder(glm::vec3 scale);
+  WFBoxBuilder(glm::vec3 scale);
 
 public:
   glm::vec3 getScale() const;

@@ -2,6 +2,8 @@
 
 #include "components/Component.hpp"
 
+#include <functional>
+
 class Builder
 {
 public:
@@ -11,6 +13,8 @@ public:
     std::vector<GLuint> indexes;
   };
 
+  using ColorationMethod = std::function<glm::vec4(VertexType)>;
+
 protected:
-  virtual Result makeMeshContent() const = 0;
+  virtual Result makeMeshContent(ColorationMethod) const = 0;
 };

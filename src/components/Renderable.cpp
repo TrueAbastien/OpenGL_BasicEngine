@@ -7,8 +7,9 @@
 // ------------------------------------------------------------------------------------------------
 Renderable::Renderable()
   : vertexShader(SHADER_DIR "/shader.vert", GL_VERTEX_SHADER),
-    fragmentShader(SHADER_DIR "/shader.frag", GL_FRAGMENT_SHADER),
-    shaderProgram({vertexShader, fragmentShader})
+  fragmentShader(SHADER_DIR "/shader.frag", GL_FRAGMENT_SHADER),
+  shaderProgram({vertexShader, fragmentShader}),
+  mode(GL_TRIANGLES)
 {
   glCheckError(__FILE__, __LINE__);
 }
@@ -59,7 +60,7 @@ void Renderable::initializeRenderable(std::vector<VertexType> vertices,
 }
 
 // ------------------------------------------------------------------------------------------------
-void Renderable::updateRenderable(Renderer* renderer, glm::mat4 worldToLocal, GLsizei nFaces)
+void Renderable::updateRenderable(Renderer* renderer, glm::mat4 worldToLocal, GLsizei nValues)
 {
   shaderProgram.use();
 
@@ -75,8 +76,8 @@ void Renderable::updateRenderable(Renderer* renderer, glm::mat4 worldToLocal, GL
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
 
   glCheckError(__FILE__, __LINE__);
-  glDrawElements(GL_TRIANGLES,     // mode
-                 nFaces * 3,       // count
+  glDrawElements(mode,             // mode
+                 nValues,          // count
                  GL_UNSIGNED_INT,  // type
                  NULL              // element array buffer offset
   );

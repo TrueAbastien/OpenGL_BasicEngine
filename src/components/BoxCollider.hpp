@@ -2,9 +2,9 @@
 
 #include "Physical.hpp"
 
-#include "builders/BoxBuilder.hpp"
+#include "builders/WFBoxBuilder.hpp"
 
-class BoxCollider final : public Physical, public BoxBuilder
+class BoxCollider final : public Physical, public WFBoxBuilder
 {
 public:
   BoxCollider(const std::shared_ptr<Meshable>& target);
