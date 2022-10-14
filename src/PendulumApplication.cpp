@@ -83,7 +83,7 @@ PendulumApplication::PendulumApplication()
   {
     auto ground = std::make_shared<BoxCollider>(
       std::make_shared<Box>(glm::vec3(10.0, 10.0, 1.0)));
-    auto wrapper = std::make_shared<RigidBody>(ground, 1e+6, 0.0);
+    auto wrapper = std::make_shared<RigidBody>(ground, 300.0, 0.0);
     wrapper->translateBy(glm::vec3(0.0, 0.0, -3.0));
     m_scene->addChild(wrapper);
 
@@ -106,7 +106,8 @@ PendulumApplication::PendulumApplication()
   /*{
     float force = 10.0f;
 
-    auto cube1 = std::make_shared<Box>(glm::vec3(1.0));
+    auto cube1 = std::make_shared<BoxCollider>(
+      std::make_shared<Box>(glm::vec3(1.0)));
     auto rb1 = std::make_shared<RigidBody>(cube1, 10.0, 1.0);
     rb1->translateBy(glm::vec3(0.0, -10.0, 0.0));
     rb1->addForce(RigidBody::ExternalForce
@@ -115,7 +116,8 @@ PendulumApplication::PendulumApplication()
     ));
     m_scene->addChild(rb1);
 
-    auto cube2 = std::make_shared<Box>(glm::vec3(1.0));
+    auto cube2 = std::make_shared<BoxCollider>(
+      std::make_shared<Box>(glm::vec3(1.0)));
     auto rb2 = std::make_shared<RigidBody>(cube2, 10.0, 1.0);
     rb2->translateBy(glm::vec3(0.0, 10.0, 0.0));
     rb2->addForce(RigidBody::ExternalForce

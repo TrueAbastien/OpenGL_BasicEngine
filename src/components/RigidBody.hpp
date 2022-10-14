@@ -8,16 +8,10 @@ public:
   friend CollisionDetector;
 
 public:
-  enum ForceMode
-  {
-    CONTINUOUS,
-    IMPULSE
-  };
   struct ExternalForce
   {
     glm::vec3 position;
     glm::vec3 force;
-    ForceMode mode = ForceMode::CONTINUOUS;
   };
 
 public:
@@ -46,7 +40,6 @@ private:
   void updateTransform();
   void computeForceTorque();
   void computeInertia();
-  void removeImpulseForce();
 
 protected:
   std::shared_ptr<Physical> m_target;
