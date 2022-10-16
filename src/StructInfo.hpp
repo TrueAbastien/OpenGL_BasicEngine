@@ -37,8 +37,8 @@ struct VertexType
 // Update Data
 struct UpdateData
 {
-  glm::mat4 worldToParent;
-  glm::mat4 worldToLocal;
+  glm::mat4 parentToWorld;
+  glm::mat4 localToWorld;
   double dt;
   double t;
 };

@@ -9,7 +9,7 @@ protected:
 
 protected:
   virtual void initializeRenderable(std::vector<VertexType> vertices, std::vector<GLuint> index);
-  virtual void updateRenderable(Renderer* renderer, glm::mat4 worldToLocal, GLsizei nValues);
+  virtual void updateRenderable(Renderer* renderer, glm::mat4 localToWorld, GLsizei nValues);
 
 protected:
   // shader

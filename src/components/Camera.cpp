@@ -141,7 +141,7 @@ void Camera::beforeUpdate(Renderer* renderer, UpdateData& data)
 
   // Update Transforms
   glm::mat4 mat = computeView();
-  setLocalModel(glm::inverse(mat));
+  setLocalToParent(glm::inverse(mat));
   renderer->setView(mat);
 }
 

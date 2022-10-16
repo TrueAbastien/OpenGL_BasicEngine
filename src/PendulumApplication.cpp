@@ -35,10 +35,10 @@ protected:
     previous.second -= root_angular_velocity * glm::sin(previous.first) * data.dt;
     previous.first += previous.second * data.dt;
 
-    m_parentToLocal = glm::rotate((float)previous.first, glm::vec3(-1.0, 0.0, 0.0));
-    m_parentToLocal = glm::translate(m_parentToLocal, glm::vec3(0.0, 0.0, -m_scale.z * 0.5));
+    m_localToParent = glm::rotate((float)previous.first, glm::vec3(-1.0, 0.0, 0.0));
+    m_localToParent = glm::translate(m_localToParent, glm::vec3(0.0, 0.0, -m_scale.z * 0.5));
 
-    data.worldToLocal = data.worldToParent * m_parentToLocal;
+    data.localToWorld = data.parentToWorld * m_localToParent;
     Box::beforeUpdate(renderer, data);
   }
   

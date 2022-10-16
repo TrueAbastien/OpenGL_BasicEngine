@@ -16,24 +16,24 @@
 #include <numeric>
 
 // ------------------------------------------------------------------------------------------------
-void Component::setLocalModel(const glm::mat4& model)
+void Component::setLocalToParent(const glm::mat4& model)
 {
-  m_parentToLocal = model;
+  m_localToParent = model;
 }
 
 // ------------------------------------------------------------------------------------------------
-void Component::setLocalModel(const glm::vec3& trsl, const glm::vec3& rot)
+void Component::setLocalToParent(const glm::vec3& trsl, const glm::vec3& rot)
 {
   glm::mat4 tr = glm::rotate(rot.x, glm::vec3(1.0, 0.0, 0.0)) *
                  glm::rotate(rot.y, glm::vec3(0.0, 1.0, 0.0)) *
                  glm::rotate(rot.z, glm::vec3(0.0, 0.0, 1.0));
-  m_parentToLocal = glm::translate(glm::mat4(1.0), trsl) * tr;
+  m_localToParent = glm::translate(glm::mat4(1.0), trsl) * tr;
 }
 
 // ------------------------------------------------------------------------------------------------
-glm::mat4 Component::getLocalModel() const
+glm::mat4 Component::getLocalToParent() const
 {
-  return m_parentToLocal;
+  return m_localToParent;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -100,14 +100,14 @@ void Component::setParent(Component* parent)
 }
 
 // ------------------------------------------------------------------------------------------------
-glm::mat4 Component::worldToLocal() const
+glm::mat4 Component::localToWorld() const
 {
   if (m_parent != nullptr)
   {
-    return m_parent->worldToLocal() * m_parentToLocal;
+    return m_parent->localToWorld() * m_localToParent;
   }
 
-  return m_parentToLocal;
+  return m_localToParent;
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -125,8 +125,8 @@ void Component::initialize(Renderer* renderer)
 void Component::update(Renderer* renderer, UpdateData& data)
 {
   UpdateData newData = data;
-  newData.worldToParent = data.worldToLocal;
-  newData.worldToLocal *= m_parentToLocal;
+  newData.parentToWorld = data.localToWorld;
+  newData.localToWorld *= m_localToParent;
 
   beforeUpdate(renderer, newData);
 

@@ -137,7 +137,7 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
   // Rotation
   m_angularMomentum += m_torque * (float) data.dt;
   // ---
-  glm::mat3 rot = m_parentToLocal;
+  glm::mat3 rot = m_localToParent;
   glm::mat3 rot_t = glm::transpose(rot);
   glm::mat3 invI = rot * m_invIBody * rot_t;
   glm::vec3 angular_velocity = invI * m_angularMomentum;
@@ -154,13 +154,13 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
   m_rotation += angular_velocity * (float) data.dt;
 
   updateTransform();
-  data.worldToLocal = data.worldToParent * m_parentToLocal;
+  data.localToWorld = data.parentToWorld * m_localToParent;
 }
 
 // ------------------------------------------------------------------------------------------------
 void RigidBody::updateTransform()
 {
-  setLocalModel(m_position, m_rotation);
+  setLocalToParent(m_position, m_rotation);
 }
 
 // ------------------------------------------------------------------------------------------------

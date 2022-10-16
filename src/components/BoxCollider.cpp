@@ -40,8 +40,8 @@ BoxCollider::BoxCollider(const std::shared_ptr<Meshable>& target)
   m_scale = max - min;
   glm::vec3 offset = max - m_scale * 0.5f;
 
-  m_parentToLocal = glm::translate(target->getLocalModel(), offset);
-  target->setLocalModel(glm::mat4(1.0));
+  m_localToParent = glm::translate(target->getLocalToParent(), offset);
+  target->setLocalToParent(glm::mat4(1.0));
 
   Meshable::makeMesh(makeMeshContent(
     [](auto)
@@ -68,7 +68,7 @@ void BoxCollider::beforeInitialize(Renderer* renderer)
 // ------------------------------------------------------------------------------------------------
 void BoxCollider::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
-  Meshable::updateRenderable(renderer, data.worldToLocal,
+  Meshable::updateRenderable(renderer, data.localToWorld,
                              12 * // Lines on Cube
                              2);  // Values amount
 }

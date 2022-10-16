@@ -87,7 +87,7 @@ namespace CollisionUtils
     auto isColliding = [](BoxCollider* target, BoxCollider* body) -> bool
     {
       glm::vec3 miScale = target->getScale() * 0.5f;
-      glm::mat4 bodyLocal_2_TargetLocal = glm::inverse(target->worldToLocal()) * body->worldToLocal();
+      glm::mat4 bodyLocal_2_TargetLocal = glm::inverse(target->localToWorld()) * body->localToWorld();
 
       const auto vertices = body->getVertices();
       for (const auto& vertex : vertices)
@@ -106,9 +106,9 @@ namespace CollisionUtils
 
     auto closestPoint = [](BoxCollider* target, BoxCollider* body) -> CollisionBodyData
     {
-      glm::mat4 target_World2Local = target->worldToLocal();
-      glm::mat4 body_World2Local = body->worldToLocal();
-      glm::mat4 bodyLocal_2_TargetLocal = glm::inverse(target_World2Local) * body_World2Local;
+      glm::mat4 target_Local2World = target->localToWorld();
+      glm::mat4 body_Local2World = body->localToWorld();
+      glm::mat4 bodyLocal_2_TargetLocal = glm::inverse(target_Local2World) * body_Local2World;
 
       glm::vec3 targetOrigin_inBody = glm::inverse(bodyLocal_2_TargetLocal) * glm::vec4(0.0, 0.0, 0.0, 1.0);
       glm::vec3 miScale = body->getScale() * 0.5f;
@@ -129,15 +129,15 @@ namespace CollisionUtils
       {
         return CollisionBodyData
         {
-          target_World2Local * glm::vec4(0.0, 0.0, 0.0, 1.0), // Position
-          glm::normalize((glm::vec3) (body_World2Local * glm::vec4(targetOrigin_inBody, 0.0))) // Normal
+          target_Local2World * glm::vec4(0.0, 0.0, 0.0, 1.0), // Position
+          glm::normalize((glm::vec3) (body_Local2World * glm::vec4(targetOrigin_inBody, 0.0))) // Normal
         };
       }
 
       return CollisionBodyData
       {
-        body_World2Local * glm::vec4(targetOrigin_inBody * factorInfo.first, 1.0), // Position
-        target_World2Local * glm::vec4(factorInfo.second, 0.0) // Normal
+        body_Local2World * glm::vec4(targetOrigin_inBody * factorInfo.first, 1.0), // Position
+        target_Local2World * glm::vec4(factorInfo.second, 0.0) // Normal
       };
     };
 

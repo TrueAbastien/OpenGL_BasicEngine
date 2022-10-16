@@ -60,13 +60,13 @@ void Renderable::initializeRenderable(std::vector<VertexType> vertices,
 }
 
 // ------------------------------------------------------------------------------------------------
-void Renderable::updateRenderable(Renderer* renderer, glm::mat4 worldToLocal, GLsizei nValues)
+void Renderable::updateRenderable(Renderer* renderer, glm::mat4 localToWorld, GLsizei nValues)
 {
   shaderProgram.use();
 
   // send uniforms
   shaderProgram.setUniform("projection", renderer->getProjection());
-  shaderProgram.setUniform("view", renderer->getView() * worldToLocal);
+  shaderProgram.setUniform("view", renderer->getView() * localToWorld);
 
   glCheckError(__FILE__, __LINE__);
 
