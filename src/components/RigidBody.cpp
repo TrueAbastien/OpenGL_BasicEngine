@@ -131,11 +131,11 @@ void RigidBody::initialize(Renderer* renderer)
 void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
   // Position
-  m_linear_velocity += m_force * (float) (data.dt / m_mass);
-  m_position += m_linear_velocity * (float) data.dt;
+  m_linear_velocity += data.dt * m_force / m_mass;
+  m_position += data.dt * m_linear_velocity;
 
   // Rotation
-  m_angularMomentum += m_torque * (float) data.dt;
+  m_angularMomentum += data.dt * m_torque;
   // ---
   glm::mat3 rot = m_localToParent;
   glm::mat3 rot_t = glm::transpose(rot);
@@ -151,7 +151,7 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
   };
   m_derived_rotation = starMatrix(glm::normalize(angular_velocity)) * m_rotation;*/
   // ---
-  m_rotation += angular_velocity * (float) data.dt;
+  m_rotation += data.dt * angular_velocity;
 
   updateTransform();
   data.localToWorld = data.parentToWorld * m_localToParent;

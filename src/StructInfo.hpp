@@ -6,6 +6,9 @@
 #include <iostream>
 #include <map>
 
+// Definitions
+constexpr static float h_step = 0.02f;
+
 // Collision Data Response
 struct CollisionBodyData
 {
@@ -39,6 +42,6 @@ struct UpdateData
 {
   glm::mat4 parentToWorld;
   glm::mat4 localToWorld;
-  double dt;
-  double t;
+  float dt;
+  float t;
 };

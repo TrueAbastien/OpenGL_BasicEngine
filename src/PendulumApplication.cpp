@@ -83,9 +83,9 @@ PendulumApplication::PendulumApplication()
   {
     auto ground = std::make_shared<BoxCollider>(
       std::make_shared<Box>(glm::vec3(10.0, 10.0, 1.0)));
-    auto wrapper = std::make_shared<RigidBody>(ground, 300.0, 0.0);
+    auto wrapper = std::make_shared<RigidBody>(ground, 1e+6, 0.0);
     wrapper->translateBy(glm::vec3(0.0, 0.0, -3.0));
-    //wrapper->rotateBy(glm::vec3(glm::pi<float>() * 0.15f, 0.0, 0.0));
+    wrapper->rotateBy(glm::vec3(0.5f, 0.0, 0.0));
     m_scene->addChild(wrapper);
 
     auto box = std::make_shared<BoxCollider>(
@@ -158,8 +158,9 @@ void PendulumApplication::loop() {
   ImGui::NewFrame();
 
   UpdateData data;
-  data.dt = (double) getFrameDeltaTime();
-  data.t = (double) getTime();
+  //data.dt = getFrameDeltaTime();
+  data.dt = h_step;
+  data.t = getTime();
   m_renderer->update(m_scene.get(), data);
 
   {

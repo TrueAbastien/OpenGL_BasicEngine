@@ -1,6 +1,8 @@
 
 #include "Application.hpp"
 
+#include "StructInfo.hpp"
+
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
 #include <iostream>
@@ -92,10 +94,12 @@ void Application::run() {
 
   time = glfwGetTime();
 
-  while (state == stateRun) {
+  while (state == stateRun)
+  {
     // compute new time and delta time
     float t = glfwGetTime();
     deltaTime = t - time;
+    if (deltaTime < h_step) continue;
     time = t;
 
     // detech window related changes

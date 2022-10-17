@@ -24,7 +24,7 @@ namespace CameraDefinitions
 }
 
 // ------------------------------------------------------------------------------------------------
-void inputCallback(GLFWwindow* window, double dt)
+void inputCallback(GLFWwindow* window, float dt)
 {
   if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     glfwSetWindowShouldClose(window, true);
