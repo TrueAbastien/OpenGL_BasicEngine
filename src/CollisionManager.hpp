@@ -3,6 +3,8 @@
 #include "components/Physical.hpp"
 #include "components/BoxCollider.hpp"
 
+#include "GJK.hpp"
+
 #include <algorithm>
 #include <vector>
 #include <numeric>
@@ -152,106 +154,108 @@ namespace CollisionUtils
     //  closestPoint(body2, body1)
     //);
 
-    struct OBBCollisionVertex
-    {
-      glm::vec3 localPosition;    // Vertex Position in Local Target
-      glm::vec3 inBodyPosition;   // Vertex Position in Body
-      bool isInBodySpace = false; // Is Vertex in Body
-    };
+    //struct OBBCollisionVertex
+    //{
+    //  glm::vec3 localPosition;    // Vertex Position in Local Target
+    //  glm::vec3 inBodyPosition;   // Vertex Position in Body
+    //  bool isInBodySpace = false; // Is Vertex in Body
+    //};
 
-    struct OBBCollisionEdge
-    {
-      OBBCollisionVertex* lowerVertex;
-      OBBCollisionVertex* upperVertex;
-      int nVertexInBodySpace = 0;
-    };
+    //struct OBBCollisionEdge
+    //{
+    //  OBBCollisionVertex* lowerVertex;
+    //  OBBCollisionVertex* upperVertex;
+    //  int nVertexInBodySpace = 0;
+    //};
 
-    const auto targetInBody_collisions = [](BoxCollider* target, BoxCollider* body)
-    {
-      std::array<std::array<std::array<OBBCollisionVertex, 2>, 2>, 2> target_vertices; // X, Y, Z
-      std::array<std::array<OBBCollisionEdge, 4>, 3> target_edges; // 3 Lower Faces (YZ, XZ, XY), 4 Normals (L -> U)
+    //const auto targetInBody_collisions = [](BoxCollider* target, BoxCollider* body)
+    //{
+    //  std::array<std::array<std::array<OBBCollisionVertex, 2>, 2>, 2> target_vertices; // X, Y, Z
+    //  std::array<std::array<OBBCollisionEdge, 4>, 3> target_edges; // 3 Lower Faces (YZ, XZ, XY), 4 Normals (L -> U)
 
-      // Vertices Initialization ------------------------------------------------------------------
+    //  // Vertices Initialization ------------------------------------------------------------------
 
-      glm::vec3 target_miScale = target->getScale() * 0.5f;
-      glm::vec3 body_miScale = body->getScale() * 0.5f;
+    //  glm::vec3 target_miScale = target->getScale() * 0.5f;
+    //  glm::vec3 body_miScale = body->getScale() * 0.5f;
 
-      glm::mat4 targetToBody = glm::inverse(body->localToWorld()) * target->localToWorld();
+    //  glm::mat4 targetToBody = glm::inverse(body->localToWorld()) * target->localToWorld();
 
-      for (int x = 0; x < 2; ++x)
-      {
-        for (int y = 0; y < 2; ++y)
-        {
-          for (int z = 0; z < 2; ++z)
-          {
-            auto& vertex = target_vertices[x][y][z];
+    //  for (int x = 0; x < 2; ++x)
+    //  {
+    //    for (int y = 0; y < 2; ++y)
+    //    {
+    //      for (int z = 0; z < 2; ++z)
+    //      {
+    //        auto& vertex = target_vertices[x][y][z];
 
-            glm::vec3 localPosition = target_miScale * (glm::vec3(x, y, z) * 2.0f - 1.0f);
-            glm::vec3 inBodyPosition = targetToBody * glm::vec4(vertex.localPosition, 1.0);
+    //        glm::vec3 localPosition = target_miScale * (glm::vec3(x, y, z) * 2.0f - 1.0f);
+    //        glm::vec3 inBodyPosition = targetToBody * glm::vec4(vertex.localPosition, 1.0);
 
-            bool isInBodySpace =
-              glm::abs(inBodyPosition.x) <= body_miScale.x &&
-              glm::abs(inBodyPosition.y) <= body_miScale.y &&
-              glm::abs(inBodyPosition.z) <= body_miScale.z;
+    //        bool isInBodySpace =
+    //          glm::abs(inBodyPosition.x) <= body_miScale.x &&
+    //          glm::abs(inBodyPosition.y) <= body_miScale.y &&
+    //          glm::abs(inBodyPosition.z) <= body_miScale.z;
 
-            vertex = OBBCollisionVertex
-            {
-              localPosition,
-              inBodyPosition,
-              isInBodySpace
-            };
-          }
-        }
-      }
+    //        vertex = OBBCollisionVertex
+    //        {
+    //          localPosition,
+    //          inBodyPosition,
+    //          isInBodySpace
+    //        };
+    //      }
+    //    }
+    //  }
 
-      // Target Inside Body Verification ----------------------------------------------------------
+    //  // Target Inside Body Verification ----------------------------------------------------------
 
-      const auto checkVerticesInBody = [&]()
-      {
-        for (int x = 0; x < 2; ++x)
-          for (int y = 0; y < 2; ++y)
-            for (int z = 0; z < 2; ++z)
-              if (!target_vertices[x][y][z].isInBodySpace)
-                return false;
-        return true;
-      };
+    //  const auto checkVerticesInBody = [&]()
+    //  {
+    //    for (int x = 0; x < 2; ++x)
+    //      for (int y = 0; y < 2; ++y)
+    //        for (int z = 0; z < 2; ++z)
+    //          if (!target_vertices[x][y][z].isInBodySpace)
+    //            return false;
+    //    return true;
+    //  };
 
-      if (checkVerticesInBody())
-      {
-        // TODO: complete return
-      }
+    //  if (checkVerticesInBody())
+    //  {
+    //    // TODO: complete return
+    //  }
 
-      // Edges Initialization ---------------------------------------------------------------------
+    //  // Edges Initialization ---------------------------------------------------------------------
 
-      const auto makeEdge = [](OBBCollisionVertex& lower, OBBCollisionVertex& upper)
-      {
-        return OBBCollisionEdge
-        {
-          &lower, &upper,
-          (lower.isInBodySpace ? 1 : 0) + (upper.isInBodySpace ? 1 : 0)
-        };
-      };
+    //  const auto makeEdge = [](OBBCollisionVertex& lower, OBBCollisionVertex& upper)
+    //  {
+    //    return OBBCollisionEdge
+    //    {
+    //      &lower, &upper,
+    //      (lower.isInBodySpace ? 1 : 0) + (upper.isInBodySpace ? 1 : 0)
+    //    };
+    //  };
 
-      // Lower YZ Plane
-      target_edges[0][0] = makeEdge(target_vertices[0][0][0], target_vertices[1][0][0]);
-      target_edges[0][1] = makeEdge(target_vertices[0][0][1], target_vertices[1][0][1]);
-      target_edges[0][2] = makeEdge(target_vertices[0][1][0], target_vertices[1][1][0]);
-      target_edges[0][3] = makeEdge(target_vertices[0][1][1], target_vertices[1][1][1]);
+    //  // Lower YZ Plane
+    //  target_edges[0][0] = makeEdge(target_vertices[0][0][0], target_vertices[1][0][0]);
+    //  target_edges[0][1] = makeEdge(target_vertices[0][0][1], target_vertices[1][0][1]);
+    //  target_edges[0][2] = makeEdge(target_vertices[0][1][0], target_vertices[1][1][0]);
+    //  target_edges[0][3] = makeEdge(target_vertices[0][1][1], target_vertices[1][1][1]);
 
-      // Lower XZ Plane
-      target_edges[1][0] = makeEdge(target_vertices[0][0][0], target_vertices[0][1][0]);
-      target_edges[1][1] = makeEdge(target_vertices[0][0][1], target_vertices[0][1][1]);
-      target_edges[1][2] = makeEdge(target_vertices[1][0][0], target_vertices[1][1][0]);
-      target_edges[1][3] = makeEdge(target_vertices[1][0][1], target_vertices[1][1][1]);
+    //  // Lower XZ Plane
+    //  target_edges[1][0] = makeEdge(target_vertices[0][0][0], target_vertices[0][1][0]);
+    //  target_edges[1][1] = makeEdge(target_vertices[0][0][1], target_vertices[0][1][1]);
+    //  target_edges[1][2] = makeEdge(target_vertices[1][0][0], target_vertices[1][1][0]);
+    //  target_edges[1][3] = makeEdge(target_vertices[1][0][1], target_vertices[1][1][1]);
 
-      // Lower XZ Plane
-      target_edges[2][0] = makeEdge(target_vertices[0][0][0], target_vertices[0][0][1]);
-      target_edges[2][1] = makeEdge(target_vertices[0][1][0], target_vertices[0][1][1]);
-      target_edges[2][2] = makeEdge(target_vertices[1][0][0], target_vertices[1][0][1]);
-      target_edges[2][3] = makeEdge(target_vertices[1][1][0], target_vertices[1][1][1]);
+    //  // Lower XZ Plane
+    //  target_edges[2][0] = makeEdge(target_vertices[0][0][0], target_vertices[0][0][1]);
+    //  target_edges[2][1] = makeEdge(target_vertices[0][1][0], target_vertices[0][1][1]);
+    //  target_edges[2][2] = makeEdge(target_vertices[1][0][0], target_vertices[1][0][1]);
+    //  target_edges[2][3] = makeEdge(target_vertices[1][1][0], target_vertices[1][1][1]);
 
-      // TODO: edge collisions
-    };
+    //  // TODO: edge collisions
+    //};
+    
+    return algo::solveGJK(body1, body2);
   }
 }
 
