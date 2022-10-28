@@ -8,6 +8,8 @@ set(MAIN_SOURCES
   Application.hpp
   CollisionManager.cpp
   CollisionManager.hpp
+  GJK.cpp
+  GJK.hpp
   glError.cpp
   glError.hpp
   main.cpp
