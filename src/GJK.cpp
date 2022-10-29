@@ -170,9 +170,9 @@ namespace algo
 		{
 			switch (points.size())
 			{
-				case 1: return InternalSimplex<1>(points, direction);
 				case 2: return InternalSimplex<2>(points, direction);
 				case 3: return InternalSimplex<3>(points, direction);
+				case 4: return InternalSimplex<4>(points, direction);
 				default: return false;
 			}
 		}
@@ -346,7 +346,7 @@ namespace algo
 			// TODO: verify this
 			CollisionBodyData result;
 			result.normal = minNormal;
-			result.worldPosition = *points.rbegin();
+			result.worldPosition = *points.begin();
 
 			return result;
 		}

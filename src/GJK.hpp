@@ -4,5 +4,5 @@
 
 namespace algo
 {
-  CollisionResult solveGJK(Meshable* body1, Meshable* body2);
+  CollisionResult solveGJK(const Meshable* body1, const Meshable* body2);
 }
