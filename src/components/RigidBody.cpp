@@ -8,11 +8,11 @@
 #include <algorithm>
 
 // ------------------------------------------------------------------------------------------------
-RigidBody::RigidBody(const std::shared_ptr<Physical>& target, float mass, float elasticity)
-  : m_target(target), m_mass(1.0), m_elasticity(0.0),
+RigidBody::RigidBody(const std::shared_ptr<Physical>& target, float mass, float elasticity, bool isKinematic)
+  : m_target(target), m_mass(1.0), m_elasticity(0.0), m_isKinematic(isKinematic),
   m_position(glm::vec3(0.0)), m_rotation(glm::vec3(0.0)),
-  m_linear_velocity(glm::vec3(0.0)), //m_derived_rotation(glm::mat3(0.0)),
-  m_angularMomentum(glm::vec3(0.0)),
+  m_currLinearVelocity(glm::vec3(0.0)), m_nextLinearVelocity(glm::vec3(0.0)),
+  m_currAngularMomentum(glm::vec3(0.0)), m_nextAngularMomentum(glm::vec3(0.0)),
   m_force(glm::vec3(0.0)), m_torque(glm::vec3(0.0))
 {
   setMass(mass);
@@ -100,6 +100,18 @@ float RigidBody::getElasticity() const
 }
 
 // ------------------------------------------------------------------------------------------------
+void RigidBody::setKinematicState(bool isKinematic)
+{
+  m_isKinematic = isKinematic;
+}
+
+// ------------------------------------------------------------------------------------------------
+bool RigidBody::isKinematic() const
+{
+  return m_isKinematic;
+}
+
+// ------------------------------------------------------------------------------------------------
 void RigidBody::translateBy(const glm::vec3& trsl)
 {
   m_position += trsl;
@@ -131,25 +143,18 @@ void RigidBody::initialize(Renderer* renderer)
 void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
   // Position
-  m_linear_velocity += data.dt * m_force / m_mass;
-  m_position += data.dt * m_linear_velocity;
+  m_nextLinearVelocity += data.dt * m_force / m_mass;
+  m_currLinearVelocity = m_nextLinearVelocity;
+  m_position += data.dt * m_currLinearVelocity;
 
   // Rotation
-  m_angularMomentum += data.dt * m_torque;
+  m_nextAngularMomentum += data.dt * m_torque;
+  m_currAngularMomentum = m_nextAngularMomentum;
   // ---
   glm::mat3 rot = m_localToParent;
   glm::mat3 rot_t = glm::transpose(rot);
   glm::mat3 invI = rot * m_invIBody * rot_t;
-  glm::vec3 angular_velocity = invI * m_angularMomentum;
-  // ---
-  /*auto starMatrix = [](const glm::vec3& v) -> glm::mat3
-  {
-    return glm::mat3(
-      0.0, -v.z, v.y,
-      v.z, 0.0, -v.x,
-      -v.y, v.x, 0.0);
-  };
-  m_derived_rotation = starMatrix(glm::normalize(angular_velocity)) * m_rotation;*/
+  glm::vec3 angular_velocity = invI * m_currAngularMomentum;
   // ---
   m_rotation += data.dt * angular_velocity;
 
