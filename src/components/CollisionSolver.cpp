@@ -56,6 +56,8 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
         continue;
       }
 
+      glm::vec3 localPosition = glm::inverse(rb1->localToWorld()) * glm::vec4(result.second.first.worldPosition, 1.0);
+
       float rb1_velocity = glm::dot(rb1->m_currLinearVelocity, result.second.first.normal);
       float rb2_velocity = glm::dot(rb2->m_currLinearVelocity, result.second.second.normal);
 
@@ -73,6 +75,8 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
 
       rb1->m_nextLinearVelocity = reflect(rb1->m_currLinearVelocity, result.second.first.normal, v1);
       //rb2->m_nextLinearVelocity = reflect(rb2->m_currLinearVelocity, result.second.second.normal, v2);
+
+      rb1->m_nextAngularMomentum = glm::cross(localPosition, result.second.first.normal);
     }
 
     // TODO: better implementation

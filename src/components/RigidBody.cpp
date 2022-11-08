@@ -140,6 +140,14 @@ void RigidBody::initialize(Renderer* renderer)
 }
 
 // ------------------------------------------------------------------------------------------------
+glm::mat3 RigidBody::getInvI() const
+{
+  glm::mat3 rot = m_localToParent;
+  glm::mat3 rot_t = glm::transpose(rot);
+  return rot * m_invIBody * rot_t;
+}
+
+// ------------------------------------------------------------------------------------------------
 void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
   // Position
@@ -151,9 +159,7 @@ void RigidBody::beforeUpdate(Renderer* renderer, UpdateData& data)
   m_nextAngularMomentum += data.dt * m_torque;
   m_currAngularMomentum = m_nextAngularMomentum;
   // ---
-  glm::mat3 rot = m_localToParent;
-  glm::mat3 rot_t = glm::transpose(rot);
-  glm::mat3 invI = rot * m_invIBody * rot_t;
+  glm::mat3 invI = getInvI();
   glm::vec3 angular_velocity = invI * m_currAngularMomentum;
   // ---
   m_rotation += data.dt * angular_velocity;

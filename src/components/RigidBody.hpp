@@ -37,6 +37,8 @@ public:
 protected:
   void initialize(Renderer* renderer) override;
 
+  glm::mat3 getInvI() const;
+
 private:
   void beforeUpdate(Renderer* renderer, UpdateData& data) override;
 
