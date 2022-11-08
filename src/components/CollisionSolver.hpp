@@ -2,10 +2,10 @@
 
 #include "CollisionManager.hpp"
 
-class CollisionDetector final : public Component
+class CollisionSolver final : public Component
 {
 public:
-  CollisionDetector(CollisionManager* manager);
+  CollisionSolver(CollisionManager* manager);
 
 protected:
   void beforeUpdate(Renderer* renderer, UpdateData& data) override;

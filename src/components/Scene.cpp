@@ -1,7 +1,7 @@
 #include "Scene.hpp"
 
 #include "Camera.hpp"
-#include "CollisionDetector.hpp"
+#include "CollisionSolver.hpp"
 #include "Renderer.hpp"
 
 #include "imgui_impl_glfw.h"
@@ -41,7 +41,7 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 Scene::Scene(Renderer* renderer)
 {
   addChild(std::make_shared<Camera>());
-  addChild(std::make_shared<CollisionDetector>(renderer->getCollisionManager().get()));
+  addChild(std::make_shared<CollisionSolver>(renderer->getCollisionManager().get()));
 }
 
 // ------------------------------------------------------------------------------------------------

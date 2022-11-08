@@ -39,8 +39,8 @@ set(COMPONENT_SOURCES
   BoxCollider.hpp
   Camera.cpp
   Camera.hpp
-  CollisionDetector.cpp
-  CollisionDetector.hpp
+  CollisionSolver.cpp
+  CollisionSolver.hpp
   Component.cpp
   Component.hpp
   EmptyTransform.hpp

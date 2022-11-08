@@ -5,7 +5,7 @@
 class RigidBody final : public Component
 {
 public:
-  friend CollisionDetector;
+  friend CollisionSolver;
 
 public:
   struct ExternalForce

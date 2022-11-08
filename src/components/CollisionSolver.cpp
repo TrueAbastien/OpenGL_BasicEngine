@@ -1,15 +1,15 @@
-#include "CollisionDetector.hpp"
+#include "CollisionSolver.hpp"
 
 #include "RigidBody.hpp"
 
 // ------------------------------------------------------------------------------------------------
-CollisionDetector::CollisionDetector(CollisionManager* manager)
+CollisionSolver::CollisionSolver(CollisionManager* manager)
   : m_manager(manager)
 {
 }
 
 // ------------------------------------------------------------------------------------------------
-void CollisionDetector::beforeUpdate(Renderer* renderer, UpdateData& data)
+void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
   auto collisionsMap = m_manager->computeAllCollisions();
 

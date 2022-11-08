@@ -24,7 +24,7 @@ class Renderer;
 class CollisionManager;
 class Physical;
 class RigidBody;
-class CollisionDetector;
+class CollisionSolver;
 
 // Forward Inner Using (see. CollisionManager.hpp)
 using CurrentTargetCollisions = std::map<Physical*, CollisionInternalResult>;
