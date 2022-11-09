@@ -27,6 +27,8 @@ set(BUILDER_SOURCES
   Builder.hpp
   BoxBuilder.cpp
   BoxBuilder.hpp
+  TetrahedronBuilder.cpp
+  TetrahedronBuilder.hpp
   WFBoxBuilder.cpp
   WFBoxBuilder.hpp
 )
@@ -54,6 +56,8 @@ set(COMPONENT_SOURCES
   RigidBody.hpp
   Scene.cpp
   Scene.hpp
+  Tetrahedron.cpp
+  Tetrahedron.hpp
 )
 list(TRANSFORM COMPONENT_SOURCES PREPEND "src/components/")
 

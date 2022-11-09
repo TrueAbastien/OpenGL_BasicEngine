@@ -1,5 +1,7 @@
 #include "GJK.hpp"
 
+#include <numeric>
+
 namespace algo
 {
 	namespace GJK
@@ -346,7 +348,18 @@ namespace algo
 			// TODO: verify this
 			CollisionBodyData result;
 			result.normal = minNormal;
-			result.worldPosition = *points.begin();
+
+			glm::vec3 barycenter = std::accumulate(points.begin(), points.end(), glm::vec3(0.0)) / (float) points.size();
+			result.worldPosition = barycenter;
+
+			/*float coeff = 0.0;
+			glm::vec3 weightedOffset = std::accumulate(points.begin(), points.end(), glm::vec3(0.0), [&](glm::vec3 prev, glm::vec3 curr)
+																						 {
+																							 float k = glm::dot(minNormal, curr - barycenter);
+																							 coeff += k;
+																							 return prev + curr * k;
+																						 });
+			result.worldPosition = weightedOffset / coeff;*/
 
 			return result;
 		}
