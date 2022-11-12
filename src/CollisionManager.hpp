@@ -87,7 +87,7 @@ namespace CollisionUtils
   template <>
   inline CollisionResult internalCompute<BoxCollider, BoxCollider>(BoxCollider* body1, BoxCollider* body2)
   {
-    auto simplex = algo::solveGJK(body1, body2);
+    /*auto simplex = algo::solveGJK(body1, body2);
 
     if (!simplex.has_value())
     {
@@ -142,7 +142,9 @@ namespace CollisionUtils
       };
     };
 
-    return std::make_pair(contact(body2), contact(body1));
+    return std::make_pair(contact(body2), contact(body1));*/
+
+    return algo::solveGJK(body1, body2);
   }
 }
 
