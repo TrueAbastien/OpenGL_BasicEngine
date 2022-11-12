@@ -13,18 +13,7 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
   auto collisionsMap = m_manager->computeAllCollisions();
 
-  /*auto removeCollision = [&](Physical* target, Physical* body)
-  {
-    auto& targetMap = collisionsMap[target];
-    auto targetIt = targetMap.find(body);
-    targetMap.erase(targetIt);
-
-    auto& bodyMap = collisionsMap[body];
-    auto bodyIt = bodyMap.find(target);
-    bodyMap.erase(bodyIt);
-  };*/
-
-  auto reflect = [](glm::vec3 dir, glm::vec3 normal, float velocity) -> glm::vec3
+  /*auto reflect = [](glm::vec3 dir, glm::vec3 normal, float velocity) -> glm::vec3
   {
     if (dir == glm::vec3(0.0))
     {
@@ -33,7 +22,7 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
 
     glm::vec3 d = glm::normalize(dir);
     return (2.0f * glm::dot(normal, -d) * normal + d) * velocity;
-  };
+  };*/
 
   for (auto& collisions : collisionsMap)
   {
@@ -48,40 +37,37 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
 
     if (result.first->hasBody() && target->hasBody())
     {
-      auto rb1 = target->getRigidBody();
-      auto rb2 = result.first->getRigidBody();
+      auto target_body = target->getRigidBody();
+      auto other_body = result.first->getRigidBody();
 
-      if (rb1->isKinematic())
+      if (target_body->isKinematic())
       {
         continue;
       }
 
-      glm::vec3 localPosition = glm::inverse(rb1->localToWorld()) * glm::vec4(result.second.first.worldPosition, 1.0);
+      glm::vec3 inTarget_localPosition =
+        glm::inverse(target_body->localToWorld())
+        * glm::vec4(result.second.first.worldPosition, 1.0);
+      glm::vec3 inOther_localPosition =
+        glm::inverse(other_body->localToWorld())
+        * glm::vec4(result.second.second.worldPosition, 1.0);
 
-      float rb1_velocity = glm::dot(rb1->m_currLinearVelocity, result.second.first.normal);
-      float rb2_velocity = glm::dot(rb2->m_currLinearVelocity, result.second.second.normal);
+      float target_velocity = glm::dot(
+        target_body->m_currLinearVelocity,
+        result.second.first.normal);
+      float other_velocity = glm::dot(
+        other_body->m_currLinearVelocity,
+        result.second.second.normal);
 
-      float v1 = (
-        rb1_velocity * rb1->m_mass +
-        rb2_velocity * rb2->m_mass +
-        (rb2_velocity - rb1_velocity) * rb2->m_mass * rb1->m_elasticity) /
-        (rb1->m_mass + rb2->m_mass);
+      float velocity = (
+        target_velocity * target_body->m_mass +
+        other_velocity * other_body->m_mass +
+        (other_velocity - target_velocity) * other_body->m_mass * target_body->m_elasticity) /
+        (target_body->m_mass + other_body->m_mass);
 
-      /*float v2 = (
-        rb1_velocity * rb1->m_mass +
-        rb2_velocity * rb2->m_mass +
-        (rb1_velocity - rb2_velocity) * rb1->m_mass * rb2->m_elasticity) /
-        (rb1->m_mass + rb2->m_mass);*/
+      target_body->m_nextLinearVelocity = result.second.first.normal * velocity;
 
-      rb1->m_nextLinearVelocity = reflect(rb1->m_currLinearVelocity, result.second.first.normal, v1);
-      //rb2->m_nextLinearVelocity = reflect(rb2->m_currLinearVelocity, result.second.second.normal, v2);
-
-      rb1->m_nextAngularMomentum = glm::cross(localPosition, result.second.first.normal);
+      target_body->m_nextAngularMomentum = glm::cross(inTarget_localPosition, result.second.first.normal) * velocity;
     }
-
-    // TODO: better implementation
-
-    // Remove in-between collisions
-    //removeCollision(target, result.first);
   }
 }

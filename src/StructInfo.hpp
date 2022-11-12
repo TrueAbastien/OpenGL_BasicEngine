@@ -15,9 +15,9 @@ struct CollisionBodyData
   glm::vec3 worldPosition;
   glm::vec3 normal;
 };
-using CollisionInternalResult = std::pair<CollisionBodyData, CollisionBodyData>;
+using CollisionManifold = std::pair<CollisionBodyData, CollisionBodyData>;
 // - Optional on Collision (inexistant means no Collision)
-using CollisionResult = std::optional<CollisionInternalResult>;
+using CollisionResult = std::optional<CollisionManifold>;
 
 // Forward Declaration
 class Renderer;
@@ -27,7 +27,7 @@ class RigidBody;
 class CollisionSolver;
 
 // Forward Inner Using (see. CollisionManager.hpp)
-using CurrentTargetCollisions = std::map<Physical*, CollisionInternalResult>;
+using CurrentTargetCollisions = std::map<Physical*, CollisionManifold>;
 
 // Vertex Data Content
 struct VertexType
