@@ -13,17 +13,6 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
   auto collisionsMap = m_manager->computeAllCollisions();
 
-  /*auto reflect = [](glm::vec3 dir, glm::vec3 normal, float velocity) -> glm::vec3
-  {
-    if (dir == glm::vec3(0.0))
-    {
-      return normal * velocity;
-    }
-
-    glm::vec3 d = glm::normalize(dir);
-    return (2.0f * glm::dot(normal, -d) * normal + d) * velocity;
-  };*/
-
   for (auto& collisions : collisionsMap)
   {
     if (collisions.second.empty())
@@ -52,12 +41,12 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
         glm::inverse(other_body->localToWorld())
         * glm::vec4(result.second.second.worldPosition, 1.0);
 
-      float target_velocity = glm::dot(
+      float target_velocity = glm::max(glm::dot(
         target_body->m_currLinearVelocity,
-        result.second.first.normal);
-      float other_velocity = glm::dot(
+        result.second.first.normal), 0.0f);
+      float other_velocity = glm::max(glm::dot(
         other_body->m_currLinearVelocity,
-        result.second.second.normal);
+        result.second.second.normal), 0.0f);
 
       float velocity = (
         target_velocity * target_body->m_mass +

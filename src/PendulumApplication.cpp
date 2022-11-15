@@ -104,6 +104,21 @@ PendulumApplication::PendulumApplication()
                           });
       m_scene->addChild(rigidBody);
     }
+
+    //{
+    //  auto box = std::make_shared<BoxCollider>(
+    //    std::make_shared<Box>(glm::vec3(2.0f, 2.0f, 0.5f)));
+    //  auto rigidBody = std::make_shared<RigidBody>(box, 10.0, 1.0);
+    //  rigidBody->translateBy(glm::vec3(0.0, 0.0, 15.0));
+    //  //rigidBody->rotateBy(glm::vec3(0.0, 0.0, glm::pi<float>()));
+    //  rigidBody->addForce(RigidBody::ExternalForce // Gravity
+    //                      {
+    //                        glm::vec3(0.0, 0.0, 0.0), // Position
+    //                        glm::vec3(0.0, 0.0, -9.81) // Force
+    //                        * rigidBody->getMass()
+    //                      });
+    //  m_scene->addChild(rigidBody);
+    //}
   }
 
   // Spring
