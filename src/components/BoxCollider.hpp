@@ -14,4 +14,8 @@ public:
 protected:
   void beforeInitialize(Renderer* renderer) override;
   void beforeUpdate(Renderer* renderer, UpdateData& data) override;
+
+public:
+  // 6 Faces Axis - 9 Edges Axis - [1]
+  std::map<BoxCollider*, uint16_t> OBBSeparatingAxis;
 };

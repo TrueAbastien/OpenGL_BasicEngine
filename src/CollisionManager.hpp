@@ -13,6 +13,9 @@
 #include <tuple>
 #include <array>
 
+// DEBUG
+#include <bitset>
+
 // ------------------------------------------------------------------------------------------------
 namespace CollisionUtils
 {
@@ -91,7 +94,6 @@ namespace CollisionUtils
 
     using Vertices = std::vector<glm::vec3>; // Set of 8 Vertices (for OBBs)
     using Interval = std::pair<float, float>; // First: Lower, Second: Upper
-    using Coefficients = std::array<std::optional<float>, 3>;
 
     // Interval of each Vertices Projection
     auto projInterval = [](const glm::vec3& axis, const Vertices& V) -> Interval
@@ -110,34 +112,30 @@ namespace CollisionUtils
     };
 
     // Is Overlapping on the specified Axis
-    auto isOverlapping = [&](const glm::vec3& axis, const Vertices& A, const Vertices& B, float& overlap) -> bool
+    auto isOverlapping = [&](const glm::vec3& axis, const Vertices& A, const Vertices& B) -> bool
     {
       Interval iA = projInterval(axis, A);
       Interval iB = projInterval(axis, B);
 
-      if (iA.first > iB.first)
+      if (iA.first >= iB.first)
       {
-        if (iA.second < iB.second) // B Contains A
+        if (iA.second <= iB.second) // B Contains A
         {
-          overlap = iA.second - iA.first;
           return true;
         }
-        if (iA.first < iB.second) // B Intersects A
+        if (iA.first <= iB.second) // B Intersects A
         {
-          overlap = iB.second - iA.first;
           return true;
         }
       }
-      else if (iB.first > iA.first)
+      else if (iB.first >= iA.first)
       {
-        if (iB.second < iA.second) // A Contains B
+        if (iB.second <= iA.second) // A Contains B
         {
-          overlap = iB.second - iB.first;
           return true;
         }
-        if (iB.first < iA.second) // A Intersects B
+        if (iB.first <= iA.second) // A Intersects B
         {
-          overlap = iA.second - iB.first;
           return true;
         }
       }
@@ -178,73 +176,149 @@ namespace CollisionUtils
     Vertices A_vertices = getVertices(body1, A);
     Vertices B_vertices = getVertices(body2, B);
 
-    glm::vec3 pos;
-    glm::vec3 A2B_normal;
-    float maxOverlap = 0.0f, overlap;
+    uint16_t sat_result = 1;
+    size_t sat_index = 0;
+    
+    auto bindNext = [&](bool r)
+    {
+      if (r) sat_result |= (1 << (++sat_index));
+      else sat_index++;
+    };
 
     // Face Axis
     for (size_t i = 0; i < 3; ++i)
     {
-      if (isOverlapping(col(A, i), A_vertices, B_vertices, overlap))
-      {
-        if (overlap > maxOverlap)
-        {
-          maxOverlap = overlap;
-          // TODO: normal, position
-        }
-      }
-      else return std::nullopt;
+      bindNext(isOverlapping(col(A, i), A_vertices, B_vertices));
     }
     for (size_t j = 0; j < 3; ++j)
     {
-      if (isOverlapping(col(B, j), A_vertices, B_vertices, overlap))
-      {
-        if (overlap > maxOverlap)
-        {
-          maxOverlap = overlap;
-          // TODO: normal, position
-        }
-      }
-      else return std::nullopt;
+      bindNext(isOverlapping(col(B, j), A_vertices, B_vertices));
     }
 
     // Edge Axis
-    //auto computeEdgeInfo = [&](size_t aI, size_t bI)
-    //{
-    //  glm::vec3 Ai = col(A, aI);
-    //  glm::vec3 Bi = col(B, bI);
+    for (size_t i = 0; i < 3; ++i)
+    {
+      for (size_t j = 0; j < 3; ++j)
+      {
+        bindNext(isOverlapping(glm::cross(col(A, i), col(B, j)), A_vertices, B_vertices));
+      }
+    }
 
-    //  glm::vec3 x, y;
-    //  float sign;
+    // Saving SAT
+    uint16_t prev_sat_result = body1->OBBSeparatingAxis.contains(body2) ? body1->OBBSeparatingAxis[body2] : 0;
+    body1->OBBSeparatingAxis[body2] = sat_result;
+    body2->OBBSeparatingAxis[body1] = sat_result;
 
-    //  // x
-    //  sign = ((aI % 2) == 1) ? -1.0f : 1.0f;
-    //  for (size_t i = 0; i < 3; ++i)
-    //  {
-    //    if (i == aI) continue;
+    // DEBUG
+    //std::bitset<16> _br(sat_result);
+    //std::cout << _br << '\n';
 
-    //    float v = sign * glm::sign(C[(3 - i) % 3][bI]);
-    //    x[i] = v * a[i];
+    // No-Intersection
+    if (sat_result != (uint16_t) ~0)
+    {
+      return std::nullopt;
+    }
 
-    //    sign *= -1.0f;
-    //  }
-    //  
-    //  // y
-    //  sign = ((bI % 2) == 1) ? -1.0f : 1.0f;
-    //  for (size_t j = 0; j < 3; ++j)
-    //  {
-    //    if (j == bI) continue;
+    glm::vec3 pos;
+    glm::vec3 A2B_normal;
 
-    //    float v = sign * glm::sign(C[aI][(3 - j) % 3]);
-    //    y[j] = v * b[j];
+    uint16_t filter = prev_sat_result ^ ~0;
 
-    //    sign *= -1.0f;
-    //  }
+    if (filter == (uint16_t) 0)
+    {
+      return std::nullopt;
+    }
 
-    //  // x
-    //  x[aI] = (1 / (1 ))
-    //};
+    size_t flag;
+    for (flag = 1; flag <= 15; ++flag)
+    {
+      if ((filter & (1 << flag)) != (uint16_t) 0)
+      {
+        break;
+      }
+    }
 
+    // Compute Position/Normal
+    
+    // - A Axis
+    if (flag >= 1 && flag <= 3)
+    {
+      size_t i = flag - 1;
+
+      // Position
+      pos = col(B, 3);
+      for (size_t j = 0; j < 3; ++j)
+      {
+        pos -= col(B, j) * glm::sign(C[i][j]) * b[j];
+      }
+
+      // Normal
+      A2B_normal = col(A, i);
+    }
+
+    // - B Axis
+    else if (flag > 3 && flag <= 6)
+    {
+      size_t j = flag - 4;
+
+      // Position
+      pos = col(A, 3);
+      for (size_t i = 0; i < 3; ++i)
+      {
+        pos += col(A, i) * glm::sign(C[i][j]) * a[i];
+      }
+      
+      // Normal
+      A2B_normal = -col(B, j);
+    }
+
+    // - A*B Axis
+    else if (flag > 6 && flag <= 15)
+    {
+      using Indexor = std::array<size_t, 3>;
+      static constexpr std::array<Indexor, 3> indexors = {
+        Indexor{ 0, 1, 2 },
+        Indexor{ 1, 0, 2 },
+        Indexor{ 2, 1, 0 }
+      };
+
+      size_t i = (flag - 7) / 3;
+      size_t j = (flag - 7) % 3;
+
+      Indexor ii = indexors[i];
+      Indexor jj = indexors[j];
+
+      auto sign2 = [](size_t f, size_t s) -> float
+      {
+        if ((f + 1) % 3 == s) return +1.0f;
+        if ((s + 1) % 3 == f) return -1.0f;
+        else return 0.0f;
+      };
+
+      glm::vec3 x, y;
+      {
+        x[ii[1]] = sign2(ii[1], ii[0]) * glm::sign(C[ii[2]][jj[0]]) * a[ii[1]];
+        x[ii[2]] = sign2(ii[2], ii[0]) * glm::sign(C[ii[1]][jj[0]]) * a[ii[2]];
+        y[jj[1]] = sign2(jj[1], jj[0]) * glm::sign(C[ii[0]][jj[2]]) * b[jj[1]];
+        y[jj[2]] = sign2(jj[2], jj[0]) * glm::sign(C[ii[0]][jj[1]]) * b[jj[2]];
+
+        x[ii[0]] = (1 / (1 - glm::pow(C[ii[0]][jj[0]], 2))) *
+          (glm::dot(col(A, ii[0]), D) + C[ii[0]][jj[0]] * (
+            -glm::dot(col(B, jj[0]), D) +
+            C[ii[1]][jj[0]] * x[ii[1]] +
+            C[ii[2]][jj[0]] * x[ii[2]]) +
+          C[ii[0]][jj[1]] * y[jj[1]] +
+          C[ii[0]][jj[2]] * y[jj[2]]);
+      }
+
+      pos = A * glm::vec4(x, 1.0);
+      A2B_normal = glm::cross(col(A, i), col(B, j));
+    }
+
+    // Error
+    else return std::nullopt;
+
+    /*
     // A0 x B0
     if (isOverlapping(glm::cross(col(A, 0), col(B, 0)), A_vertices, B_vertices, overlap))
     {
@@ -415,7 +489,7 @@ namespace CollisionUtils
              + C[2][1] * y22[1]);
       }
     }
-    // TODO
+    */
 
     // Sends out result
     return std::make_pair(

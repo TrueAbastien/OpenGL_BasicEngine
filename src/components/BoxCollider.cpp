@@ -7,7 +7,7 @@
 
 // ------------------------------------------------------------------------------------------------
 BoxCollider::BoxCollider(const std::shared_ptr<Meshable>& target)
-  : Physical(target), WFBoxBuilder(glm::vec3(0.0))
+  : Physical(target), WFBoxBuilder(glm::vec3(0.0)), OBBSeparatingAxis()
 {
   if (target == nullptr)
   {
