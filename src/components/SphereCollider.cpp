@@ -31,9 +31,9 @@ SphereCollider::SphereCollider(const std::shared_ptr<Meshable>& target)
   }
 
   m_radius = (max - min) * 0.5f;
-  float offset = max - m_radius * 0.5f;
+  // float offset = max - m_radius * 0.5f;
 
-  m_localToParent = glm::translate(target->getLocalToParent(), glm::vec3(offset));
+  // m_localToParent = glm::translate(target->getLocalToParent(), glm::vec3(offset));
   target->setLocalToParent(glm::mat4(1.0));
 
 
