@@ -16,6 +16,7 @@ protected:
   void beforeUpdate(Renderer* renderer, UpdateData& data) override;
 
 public:
-  // 6 Faces Axis - 9 Edges Axis - [1]
+  // 15 ------- 7 - 6 -------- 1 - 0
+  // 9 Edges Axis - 6 Faces Axis - 1
   std::map<BoxCollider*, uint16_t> OBBSeparatingAxis;
 };
