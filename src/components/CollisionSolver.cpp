@@ -11,6 +11,11 @@ CollisionSolver::CollisionSolver(CollisionManager* manager)
 // ------------------------------------------------------------------------------------------------
 void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
+  auto reflect = [](glm::vec3 v, glm::vec3 n)
+  {
+    return 2.0f * glm::dot(-v, n) * n + v;
+  };
+
   auto collisionsMap = m_manager->computeAllCollisions();
 
   for (auto& collisions : collisionsMap)

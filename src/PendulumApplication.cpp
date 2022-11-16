@@ -86,7 +86,7 @@ PendulumApplication::PendulumApplication()
         std::make_shared<Box>(glm::vec3(10.0, 10.0, 1.0)));
       auto wrapper = std::make_shared<RigidBody>(ground, 1e+6, 0.0, true);
       wrapper->translateBy(glm::vec3(0.0, 0.0, -3.0));
-      wrapper->rotateBy(glm::vec3(-0.2f, 0.0, 0.0));
+      wrapper->rotateBy(glm::vec3(0.1f, 0.0, 0.0));
       m_scene->addChild(wrapper);
     }
 
@@ -95,7 +95,7 @@ PendulumApplication::PendulumApplication()
         std::make_shared<Box>(glm::vec3(1.0f, 1.0f, 1.0f)));
       auto rigidBody = std::make_shared<RigidBody>(box, 10.0, 0.8);
       rigidBody->translateBy(glm::vec3(0.0, 0.0, 5.0));
-      rigidBody->rotateBy(glm::vec3(0.0, 0.0, glm::pi<float>()));
+      //rigidBody->rotateBy(glm::vec3(0.0, 0.0, glm::pi<float>()));
       rigidBody->addForce(RigidBody::ExternalForce // Gravity
                           {
                             glm::vec3(0.0, 0.0, 0.0), // Position
@@ -105,20 +105,20 @@ PendulumApplication::PendulumApplication()
       m_scene->addChild(rigidBody);
     }
 
-    //{
-    //  auto box = std::make_shared<BoxCollider>(
-    //    std::make_shared<Box>(glm::vec3(2.0f, 2.0f, 0.5f)));
-    //  auto rigidBody = std::make_shared<RigidBody>(box, 10.0, 1.0);
-    //  rigidBody->translateBy(glm::vec3(0.0, 0.0, 15.0));
-    //  //rigidBody->rotateBy(glm::vec3(0.0, 0.0, glm::pi<float>()));
-    //  rigidBody->addForce(RigidBody::ExternalForce // Gravity
-    //                      {
-    //                        glm::vec3(0.0, 0.0, 0.0), // Position
-    //                        glm::vec3(0.0, 0.0, -9.81) // Force
-    //                        * rigidBody->getMass()
-    //                      });
-    //  m_scene->addChild(rigidBody);
-    //}
+    {
+      auto box = std::make_shared<BoxCollider>(
+        std::make_shared<Box>(glm::vec3(2.0f, 2.0f, 0.5f)));
+      auto rigidBody = std::make_shared<RigidBody>(box, 10.0, 1.0);
+      rigidBody->translateBy(glm::vec3(0.0, 0.0, 15.0));
+      //rigidBody->rotateBy(glm::vec3(0.0, 0.0, glm::pi<float>()));
+      rigidBody->addForce(RigidBody::ExternalForce // Gravity
+                          {
+                            glm::vec3(0.0, 0.0, 0.0), // Position
+                            glm::vec3(0.0, 0.0, -9.81) // Force
+                            * rigidBody->getMass()
+                          });
+      m_scene->addChild(rigidBody);
+    }
   }
 
   // Spring
