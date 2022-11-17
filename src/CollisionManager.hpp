@@ -2,6 +2,7 @@
 
 #include "components/Physical.hpp"
 #include "components/BoxCollider.hpp"
+#include "components/SphereCollider.hpp"
 
 #include "GJK.hpp"
 
@@ -71,7 +72,8 @@ namespace CollisionUtils
     return physicalCastCompute<T,
 
       // List of all Physicals
-      BoxCollider
+      BoxCollider,
+      SphereCollider
       // TO COMPLETE
 
     >(target, body);
@@ -346,7 +348,51 @@ namespace CollisionUtils
 
     return std::make_pair(*resultAB, *resultBA);
   }
+
+  // Sphere Definitions ------------------------------------------------------------------------------
+  template <>
+  inline int priority<SphereCollider>()
+  {
+    return 1;
+  }
+
+  template <>
+  inline CollisionResult internalCompute<SphereCollider, SphereCollider>(SphereCollider* sphere1, SphereCollider* sphere2)
+  {
+    const float radiusSphere1 = sphere1->getRadius();
+    const float radiusSphere2 = sphere2->getRadius();
+
+    const glm::mat4 localToWorldSphere1 = sphere1->localToWorld();
+    const glm::mat4 localToWorldSphere2 = sphere2->localToWorld();
+
+    const glm::vec3 centerSphere1 = glm::vec3(localToWorldSphere1[3][0], localToWorldSphere1[3][1], localToWorldSphere1[3][2]);
+    const glm::vec3 centerSphere2 = glm::vec3(localToWorldSphere2[3][0], localToWorldSphere2[3][1], localToWorldSphere2[3][2]);
+
+    float distBetweenCenters = glm::length(centerSphere1 - centerSphere2);
+    float radiusesSum = radiusSphere1 + radiusSphere2;
+
+    if (distBetweenCenters > radiusesSum)
+    {
+      return std::nullopt;
+    } 
+
+    glm::vec3 normal = glm::normalize(centerSphere1 - centerSphere2);
+    glm::vec3 pos1 = centerSphere1 + (radiusSphere1 / distBetweenCenters) * (centerSphere2 - centerSphere1);
+    glm::vec3 pos2 = centerSphere2 + (radiusSphere2 / distBetweenCenters) * (centerSphere1 - centerSphere2);
+    glm::vec3 pos = (pos1 + pos2) * 0.5f;
+
+    return std::make_pair(
+      CollisionBodyData
+      {
+        pos, - normal
+      },
+      CollisionBodyData
+      {
+        pos, normal
+      });
+  }
 }
+
 
 // ------------------------------------------------------------------------------------------------
 class CollisionManager final

@@ -26,7 +26,7 @@ void Sphere::beforeInitialize(Renderer* renderer)
 void Sphere::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
   Meshable::updateRenderable(renderer, data.localToWorld,
-                             20 *  // Faces on Icosahedron
+                             20 *     // Faces on Icosahedron
                              4 * 4 *  // Divisions
-                             3);   // Values amount
+                             3);      // Values amount
 }

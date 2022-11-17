@@ -35,6 +35,8 @@ set(BUILDER_SOURCES
   TetrahedronBuilder.hpp
   WFBoxBuilder.cpp
   WFBoxBuilder.hpp
+  WFSphereBuilder.cpp
+  WFSphereBuilder.hpp
 )
 list(TRANSFORM BUILDER_SOURCES PREPEND "src/builders/")
 
@@ -62,6 +64,8 @@ set(COMPONENT_SOURCES
   Scene.hpp
   Sphere.cpp
   Sphere.hpp
+  SphereCollider.cpp
+  SphereCollider.hpp
   Tetrahedron.cpp
   Tetrahedron.hpp
   World.cpp
