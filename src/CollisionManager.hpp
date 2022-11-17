@@ -197,7 +197,7 @@ namespace CollisionUtils
       // Face Axis
       for (size_t i = 0; i < 3; ++i)
       {
-        bindNext(isOverlapping(col(A, i), A_vertices, B_vertices, s));
+        bindNext(isOverlapping(-col(A, i), A_vertices, B_vertices, s));
       }
       for (size_t j = 0; j < 3; ++j)
       {
