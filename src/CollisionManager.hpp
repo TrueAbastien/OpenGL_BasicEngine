@@ -2,6 +2,7 @@
 
 #include "components/Physical.hpp"
 #include "components/BoxCollider.hpp"
+#include "components/SphereCollider.hpp"
 
 #include "GJK.hpp"
 
@@ -71,7 +72,8 @@ namespace CollisionUtils
     return physicalCastCompute<T,
 
       // List of all Physicals
-      BoxCollider
+      BoxCollider,
+      SphereCollider
       // TO COMPLETE
 
     >(target, body);
@@ -346,7 +348,21 @@ namespace CollisionUtils
 
     return std::make_pair(*resultAB, *resultBA);
   }
+
+  // Sphere Definitions ------------------------------------------------------------------------------
+  template <>
+  inline int priority<SphereCollider>()
+  {
+    return 1;
+  }
+
+  template <>
+  inline CollisionResult internalCompute<SphereCollider, SphereCollider>(SphereCollider* body1, SphereCollider* body2)
+  {
+    return algo::solveGJK(body1, body2);
+  }
 }
+
 
 // ------------------------------------------------------------------------------------------------
 class CollisionManager final

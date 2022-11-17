@@ -13,6 +13,7 @@
 
 #include "components/RigidBody.hpp"
 #include "components/Box.hpp"
+#include "components/Sphere.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -83,11 +84,20 @@ PendulumApplication::PendulumApplication()
   {
     {
       auto ground = std::make_shared<BoxCollider>(
-        std::make_shared<Box>(glm::vec3(10.0, 10.0, 1.0)));
+        std::make_shared<Box>(glm::vec3(1.0, 1.0, 1.0)));
       auto wrapper = std::make_shared<RigidBody>(ground, 1e+6, 0.0, true);
       wrapper->translateBy(glm::vec3(0.0, 0.0, -3.0));
       wrapper->rotateBy(glm::vec3(0.2f, 0.0, 0.0));
       m_scene->addChild(wrapper);
+    }
+
+    {
+      auto sphereGround = std::make_shared<SphereCollider>(
+        std::make_shared<Sphere>(1.0f));
+      auto sphereWrapper = std::make_shared<RigidBody>(sphereGround, 10.0, 0.99);
+      sphereWrapper->translateBy(glm::vec3(0.0, -2.0, -3.0));
+
+      m_scene->addChild(sphereWrapper);
     }
 
     {
@@ -118,6 +128,20 @@ PendulumApplication::PendulumApplication()
                             * rigidBody->getMass()
                           });
       m_scene->addChild(rigidBody);
+    }
+    
+    {
+      auto sphere = std::make_shared<SphereCollider>(
+        std::make_shared<Sphere>(1.0f));
+      auto sphereRigidBody = std::make_shared<RigidBody>(sphere, 10.0, 0.99);
+      sphereRigidBody->translateBy(glm::vec3(0.0, -2.0, 1.0));
+      sphereRigidBody->addForce(RigidBody::ExternalForce // Gravity
+                          {
+                            glm::vec3(0.0, 0.0, 0.0), // Position
+                            glm::vec3(0.0, 0.0, -9.81) // Force
+                            * sphereRigidBody->getMass()
+                          });
+      m_scene->addChild(sphereRigidBody);
     }
   }
 
