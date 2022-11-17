@@ -123,8 +123,8 @@ namespace CollisionUtils
           }
           if (iA.first <= iB.second) // A Above B
           {
-            s = -1.0f;
-            //s = 1.0f;
+            //s = -1.0f;
+            s = 1.0f;
             return true;
           }
         }
@@ -137,7 +137,8 @@ namespace CollisionUtils
           }
           if (iB.first <= iA.second) // B Above A
           {
-            s = 1.0f;
+            //s = 1.0f;
+            s = -1.0f;
             return true;
           }
         }
