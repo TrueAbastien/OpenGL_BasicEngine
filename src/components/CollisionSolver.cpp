@@ -46,12 +46,12 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
         glm::inverse(other_body->localToWorld())
         * glm::vec4(result.second.second.worldPosition, 1.0);
 
-      float target_velocity = glm::max(glm::dot(
+      float target_velocity = glm::dot(
         target_body->m_currLinearVelocity,
-        result.second.first.normal), 0.0f);
-      float other_velocity = glm::max(glm::dot(
+        result.second.first.normal);
+      float other_velocity = glm::dot(
         other_body->m_currLinearVelocity,
-        result.second.second.normal), 0.0f);
+        result.second.second.normal);
 
       float velocity = (
         target_velocity * target_body->m_mass +

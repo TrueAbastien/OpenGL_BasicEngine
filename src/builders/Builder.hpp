@@ -14,6 +14,10 @@ public:
   };
 
   using ColorationMethod = std::function<glm::vec4(VertexType)>;
+  inline static ColorationMethod DefaultColoration = [](VertexType)
+  {
+    return glm::vec4(1.0);
+  };
 
 protected:
   virtual Result makeMeshContent(ColorationMethod) const = 0;

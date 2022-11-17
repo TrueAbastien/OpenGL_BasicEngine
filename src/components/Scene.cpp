@@ -3,6 +3,7 @@
 #include "Camera.hpp"
 #include "CollisionSolver.hpp"
 #include "Renderer.hpp"
+#include "World.hpp"
 
 #include "imgui_impl_glfw.h"
 
@@ -41,6 +42,7 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 Scene::Scene(Renderer* renderer)
 {
   addChild(std::make_shared<Camera>());
+  addChild(std::make_shared<World>());
   addChild(std::make_shared<CollisionSolver>(renderer->getCollisionManager().get()));
 }
 
