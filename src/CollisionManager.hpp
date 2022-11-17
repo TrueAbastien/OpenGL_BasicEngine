@@ -109,7 +109,7 @@ namespace CollisionUtils
       };
 
       // Is Overlapping on the specified Axis
-      auto isOverlapping = [&](const glm::vec3& axis, const Vertices& A, const Vertices& B) -> bool
+      auto isOverlapping = [&](const glm::vec3& axis, const Vertices& A, const Vertices& B, float& s) -> bool
       {
         Interval iA = projInterval(axis, A);
         Interval iB = projInterval(axis, B);
@@ -118,10 +118,13 @@ namespace CollisionUtils
         {
           if (iA.second <= iB.second) // B Contains A
           {
+            s = 0.0f;
             return true;
           }
-          if (iA.first <= iB.second) // B Intersects A
+          if (iA.first <= iB.second) // A Above B
           {
+            s = -1.0f;
+            //s = 1.0f;
             return true;
           }
         }
@@ -129,10 +132,12 @@ namespace CollisionUtils
         {
           if (iB.second <= iA.second) // A Contains B
           {
+            s = 0.0f;
             return true;
           }
-          if (iB.first <= iA.second) // A Intersects B
+          if (iB.first <= iA.second) // B Above A
           {
+            s = 1.0f;
             return true;
           }
         }
@@ -175,11 +180,16 @@ namespace CollisionUtils
       Vertices A_vertices = getVertices(bodyA, A);
       Vertices B_vertices = getVertices(bodyB, B);
 
+      std::array<float, 15> sigmas;
+      float s;
+
       uint16_t sat_result = 1;
       size_t sat_index = 0;
 
       auto bindNext = [&](bool r)
       {
+        sigmas[sat_index] = s;
+
         if (r) sat_result |= (1 << (++sat_index));
         else sat_index++;
       };
@@ -187,11 +197,11 @@ namespace CollisionUtils
       // Face Axis
       for (size_t i = 0; i < 3; ++i)
       {
-        bindNext(isOverlapping(col(A, i), A_vertices, B_vertices));
+        bindNext(isOverlapping(col(A, i), A_vertices, B_vertices, s));
       }
       for (size_t j = 0; j < 3; ++j)
       {
-        bindNext(isOverlapping(col(B, j), A_vertices, B_vertices));
+        bindNext(isOverlapping(col(B, j), A_vertices, B_vertices, s));
       }
 
       // Edge Axis
@@ -199,7 +209,7 @@ namespace CollisionUtils
       {
         for (size_t j = 0; j < 3; ++j)
         {
-          bindNext(isOverlapping(glm::cross(col(A, i), col(B, j)), A_vertices, B_vertices));
+          bindNext(isOverlapping(glm::cross(col(A, i), col(B, j)), A_vertices, B_vertices, s));
         }
       }
 
@@ -233,6 +243,7 @@ namespace CollisionUtils
       }
 
       // Compute Position/Normal
+      s = sigmas[flag - 1];
 
       // - A Axis
       if (flag >= 1 && flag <= 3)
@@ -243,11 +254,11 @@ namespace CollisionUtils
         pos = col(B, 3);
         for (size_t j = 0; j < 3; ++j)
         {
-          pos -= col(B, j) * glm::sign(C[i][j]) * b[j];
+          pos -= col(B, j) * s * glm::sign(C[i][j]) * b[j];
         }
 
         // Normal
-        A2B_normal = col(A, i);
+        A2B_normal = -s * col(A, i);
       }
 
       // - B Axis
@@ -259,11 +270,11 @@ namespace CollisionUtils
         pos = col(A, 3);
         for (size_t i = 0; i < 3; ++i)
         {
-          pos += col(A, i) * glm::sign(C[i][j]) * a[i];
+          pos += col(A, i) * s * glm::sign(C[i][j]) * a[i];
         }
 
         // Normal
-        A2B_normal = -col(B, j);
+        A2B_normal = s * col(B, j);
       }
 
       // - A*B Axis
@@ -296,10 +307,10 @@ namespace CollisionUtils
 
         glm::vec3 x, y;
         {
-          x[ii[1]] = sign2(ii[1], ii[0]) * glm::sign(C[ii[2]][jj[0]]) * a[ii[1]];
-          x[ii[2]] = sign2(ii[2], ii[0]) * glm::sign(C[ii[1]][jj[0]]) * a[ii[2]];
-          y[jj[1]] = sign2(jj[1], jj[0]) * glm::sign(C[ii[0]][jj[2]]) * b[jj[1]];
-          y[jj[2]] = sign2(jj[2], jj[0]) * glm::sign(C[ii[0]][jj[1]]) * b[jj[2]];
+          x[ii[1]] = s * sign2(ii[1], ii[0]) * glm::sign(C[ii[2]][jj[0]]) * a[ii[1]];
+          x[ii[2]] = s * sign2(ii[2], ii[0]) * glm::sign(C[ii[1]][jj[0]]) * a[ii[2]];
+          y[jj[1]] = s * sign2(jj[1], jj[0]) * glm::sign(C[ii[0]][jj[2]]) * b[jj[1]];
+          y[jj[2]] = s * sign2(jj[2], jj[0]) * glm::sign(C[ii[0]][jj[1]]) * b[jj[2]];
 
           x[ii[0]] = (1 / (1 - glm::pow(C[ii[0]][jj[0]], 2))) *
             (glm::dot(col(A, ii[0]), D) + C[ii[0]][jj[0]] * (
@@ -311,7 +322,7 @@ namespace CollisionUtils
         }
 
         pos = A * glm::vec4(x, 1.0);
-        A2B_normal = glm::cross(col(A, i), col(B, j));
+        A2B_normal = s * glm::cross(col(A, i), col(B, j));
       }
 
       // Error
