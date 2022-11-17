@@ -379,15 +379,16 @@ namespace CollisionUtils
     glm::vec3 normal = glm::normalize(centerSphere1 - centerSphere2);
     glm::vec3 pos1 = centerSphere1 + (radiusSphere1 / distBetweenCenters) * (centerSphere2 - centerSphere1);
     glm::vec3 pos2 = centerSphere2 + (radiusSphere2 / distBetweenCenters) * (centerSphere1 - centerSphere2);
+    glm::vec3 pos = (pos1 + pos2) * 0.5f;
 
     return std::make_pair(
       CollisionBodyData
       {
-        pos1, normal
+        pos, - normal
       },
       CollisionBodyData
       {
-        pos2, -normal
+        pos, normal
       });
   }
 }

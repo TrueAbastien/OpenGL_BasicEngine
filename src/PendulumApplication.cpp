@@ -94,7 +94,7 @@ PendulumApplication::PendulumApplication()
     {
       auto sphereGround = std::make_shared<SphereCollider>(
         std::make_shared<Sphere>(1.0f));
-      auto sphereWrapper = std::make_shared<RigidBody>(sphereGround, 10.0, 0.99);
+      auto sphereWrapper = std::make_shared<RigidBody>(sphereGround, 1e+6, 0.99, true);
       sphereWrapper->translateBy(glm::vec3(0.0, -2.0, -3.0));
 
       m_scene->addChild(sphereWrapper);
