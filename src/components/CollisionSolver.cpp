@@ -39,41 +39,14 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
         continue;
       }
 
-      glm::vec3 r1 =
-        glm::inverse(body1->localToWorld())
-        * glm::vec4(result.second.first.worldPosition, 1.0);
-      glm::vec3 r2 =
-        glm::inverse(body2->localToWorld())
-        * glm::vec4(result.second.second.worldPosition, 1.0);
-
-      /*float target_velocity = glm::dot(
-        target_body->m_currLinearVelocity,
-        result.second.first.normal);
-      float other_velocity = glm::dot(
-        other_body->m_currLinearVelocity,
-        result.second.second.normal);
-
-      float velocity = (
-        target_velocity * target_body->m_mass +
-        other_velocity * other_body->m_mass +
-        (other_velocity - target_velocity) * other_body->m_mass * target_body->m_elasticity) /
-        (target_body->m_mass + other_body->m_mass);
-
-      target_body->m_nextLinearVelocity = result.second.first.normal * velocity;
-
-      target_body->m_nextAngularMomentum = glm::cross(inTarget_localPosition, result.second.first.normal) * velocity;*/
-
-      /*glm::vec3 vel1 = body1->m_currLinearVelocity +
-        glm::cross(body1->m_currAngularMomentum, r1);
-      glm::vec3 vel2 = body2->m_currLinearVelocity +
-        glm::cross(body2->m_currAngularMomentum, r2);
-      glm::vec3 dv = vel1 - vel2;*/
+      glm::vec3 r1 = result.second.first.worldPosition - glm::vec3(body1->localToWorld()[3]);
+      glm::vec3 r2 = result.second.second.worldPosition - glm::vec3(body2->localToWorld()[3]);
 
       glm::vec3 v1 = body1->m_currLinearVelocity;
       glm::vec3 w1 = body1->m_currAngularMomentum;
       glm::vec3 v2 = body2->m_currLinearVelocity;
       glm::vec3 w2 = body2->m_currAngularMomentum;
-      glm::vec3 n = result.second.first.normal;
+      glm::vec3 n = glm::normalize(result.second.first.normal);
 
       glm::mat3 invI1 = body1->getInvI();
       glm::mat3 invI2 = body2->getInvI();
@@ -89,7 +62,7 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
       glm::vec3 j = impulse * n;
       
       body1->m_nextLinearVelocity -= j / m1;
-      body2->m_nextAngularMomentum -= invI1 * glm::cross(j, r1);
+      body1->m_nextAngularMomentum += invI1 * glm::cross(j, r1);
     }
   }
 }
