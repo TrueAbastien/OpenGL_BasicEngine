@@ -133,13 +133,14 @@ PendulumApplication::PendulumApplication()
     }
   }
   */
+
   {
     {
       auto ground = std::make_shared<BoxCollider>(
         std::make_shared<Box>(glm::vec3(10.0, 10.0, 1.0)));
       auto wrapper = std::make_shared<RigidBody>(ground, 1e+6, 0.0, true);
       wrapper->translateBy(glm::vec3(0.0, 0.0, -3.0));
-      wrapper->rotateBy(glm::vec3(0.2f, 0.0, 0.0));
+      wrapper->rotateBy(glm::vec3(0.1f, 0.0, 0.0));
       m_scene->addChild(wrapper);
     }
 
@@ -156,6 +157,20 @@ PendulumApplication::PendulumApplication()
                          });
       m_scene->addChild(sphereRB);
     }
+
+    //{
+    //  auto sphere = std::make_shared<SphereCollider>(
+    //    std::make_shared<Sphere>(1.0f));
+    //  auto sphereRB = std::make_shared<RigidBody>(sphere, 10.0, 0.99);
+    //  sphereRB->translateBy(glm::vec3(0.0, 0.0, 10.0));
+    //  sphereRB->addForce(RigidBody::ExternalForce // Gravity
+    //                     {
+    //                       glm::vec3(0.0, 0.0, 0.0), // Position
+    //                       glm::vec3(0.0, 0.0, -9.81) // Force
+    //                       * sphereRB->getMass()
+    //                     });
+    //  m_scene->addChild(sphereRB);
+    //}
   }
 
   m_renderer->start(m_scene.get());
