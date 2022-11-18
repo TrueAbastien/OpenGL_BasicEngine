@@ -147,14 +147,8 @@ PendulumApplication::PendulumApplication()
     {
       auto sphere = std::make_shared<SphereCollider>(
         std::make_shared<Sphere>(1.0f));
-      auto sphereRB = std::make_shared<RigidBody>(sphere, 10.0, 0.99);
+      auto sphereRB = std::make_shared<RigidBody>(sphere, 10.0, 0.99, false, true);
       sphereRB->translateBy(glm::vec3(0.0, 0.0, 5.0));
-      sphereRB->addForce(RigidBody::ExternalForce // Gravity
-                         {
-                           glm::vec3(0.0, 0.0, 0.0), // Position
-                           glm::vec3(0.0, 0.0, -9.81) // Force
-                           * sphereRB->getMass()
-                         });
       m_scene->addChild(sphereRB);
     }
 

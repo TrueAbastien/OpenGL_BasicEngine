@@ -15,7 +15,11 @@ public:
   };
 
 public:
-  RigidBody(const std::shared_ptr<Physical>& target, float mass = 1.0f, float elasticity = 0.0f, bool isKinematic = false);
+  RigidBody(const std::shared_ptr<Physical>& target,
+            float mass = 1.0f,
+            float elasticity = 0.0f,
+            bool isKinematic = false,
+            bool useGravity = false);
 
   // Returns the current amount of External Forces
   size_t addForce(const ExternalForce& force);
@@ -30,6 +34,9 @@ public:
 
   void setKinematicState(bool isKinematic);
   bool isKinematic() const;
+
+  void setGravityUse(bool useGravity);
+  bool useGravity() const;
 
   void translateBy(const glm::vec3& trsl);
   void rotateBy(const glm::vec3& rot);
@@ -63,6 +70,7 @@ protected:
   float m_mass;
   float m_elasticity;
   bool m_isKinematic;
+  bool m_useGravity;
 
   std::vector<ExternalForce> m_external_forces;
 

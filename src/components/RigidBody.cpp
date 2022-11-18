@@ -8,8 +8,9 @@
 #include <algorithm>
 
 // ------------------------------------------------------------------------------------------------
-RigidBody::RigidBody(const std::shared_ptr<Physical>& target, float mass, float elasticity, bool isKinematic)
-  : m_target(target), m_mass(1.0), m_elasticity(0.0), m_isKinematic(isKinematic),
+RigidBody::RigidBody(const std::shared_ptr<Physical>& target,
+                     float mass, float elasticity, bool isKinematic, bool useGravity)
+  : m_target(target), m_mass(1.0), m_elasticity(0.0), m_isKinematic(isKinematic), m_useGravity(false),
   m_position(glm::vec3(0.0)), m_rotation(glm::vec3(0.0)),
   m_currLinearVelocity(glm::vec3(0.0)), m_nextLinearVelocity(glm::vec3(0.0)),
   m_currAngularMomentum(glm::vec3(0.0)), m_nextAngularMomentum(glm::vec3(0.0)),
@@ -17,6 +18,7 @@ RigidBody::RigidBody(const std::shared_ptr<Physical>& target, float mass, float 
 {
   setMass(mass);
   setElasticity(elasticity);
+  setGravityUse(useGravity);
 
   if (target == nullptr)
   {
@@ -112,6 +114,20 @@ bool RigidBody::isKinematic() const
 }
 
 // ------------------------------------------------------------------------------------------------
+void RigidBody::setGravityUse(bool useGravity)
+{
+  m_useGravity = useGravity;
+
+  computeForceTorque();
+}
+
+// ------------------------------------------------------------------------------------------------
+bool RigidBody::useGravity() const
+{
+  return m_useGravity;
+}
+
+// ------------------------------------------------------------------------------------------------
 void RigidBody::translateBy(const glm::vec3& trsl)
 {
   m_position += trsl;
@@ -188,6 +204,12 @@ void RigidBody::computeForceTorque()
     return r + glm::cross(f.position, f.force);
   };
   m_torque = std::accumulate(m_external_forces.begin(), m_external_forces.end(), glm::vec3(0.0f), torqueAcc);
+
+  // Add Gravity
+  if (m_useGravity)
+  {
+    m_force += glm::vec3(0.0f, 0.0f, -9.81f * m_mass);
+  }
 }
 
 // ------------------------------------------------------------------------------------------------
