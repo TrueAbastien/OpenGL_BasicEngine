@@ -67,20 +67,8 @@ PendulumApplication::PendulumApplication()
   ImGui_ImplOpenGL3_Init();
   ImGui::StyleColorsDark();
 
-  // Pendulum
-  /*{
-    auto pendulum = std::make_shared<PendulumComponent>(9.81, 1.0, glm::pi<double>() / 5.0, 1.0);
-    m_scene->addChild(pendulum);
-
-    auto transform = std::make_shared<EmptyTransform>();
-    transform->setLocalModel(glm::vec3(0.0, 0.0, -0.5));
-    pendulum->addChild(transform);
-
-    auto dummy = std::make_shared<PendulumComponent>(9.81, 1.0, glm::pi<double>() / 5.0, 1.0);
-    transform->addChild(dummy);
-  }*/
-
   // RigidBody
+  /*
   {
     {
       auto ground = std::make_shared<BoxCollider>(
@@ -144,31 +132,31 @@ PendulumApplication::PendulumApplication()
       m_scene->addChild(sphereRigidBody);
     }
   }
+  */
+  {
+    {
+      auto ground = std::make_shared<BoxCollider>(
+        std::make_shared<Box>(glm::vec3(10.0, 10.0, 1.0)));
+      auto wrapper = std::make_shared<RigidBody>(ground, 1e+6, 0.0, true);
+      wrapper->translateBy(glm::vec3(0.0, 0.0, -3.0));
+      wrapper->rotateBy(glm::vec3(0.2f, 0.0, 0.0));
+      m_scene->addChild(wrapper);
+    }
 
-  // Spring
-  /*{
-    float force = 10.0f;
-
-    auto cube1 = std::make_shared<BoxCollider>(
-      std::make_shared<Box>(glm::vec3(1.0)));
-    auto rb1 = std::make_shared<RigidBody>(cube1, 10.0, 1.0);
-    rb1->translateBy(glm::vec3(0.0, -10.0, 0.0));
-    rb1->addForce(RigidBody::ExternalForce
-    (
-      glm::vec3(0.0), glm::vec3(0.0, force, 0.0)
-    ));
-    m_scene->addChild(rb1);
-
-    auto cube2 = std::make_shared<BoxCollider>(
-      std::make_shared<Box>(glm::vec3(1.0)));
-    auto rb2 = std::make_shared<RigidBody>(cube2, 10.0, 1.0);
-    rb2->translateBy(glm::vec3(0.0, 10.0, 0.0));
-    rb2->addForce(RigidBody::ExternalForce
-    (
-      glm::vec3(0.0), glm::vec3(0.0, -force, 0.0)
-    ));
-    m_scene->addChild(rb2);
-  }*/
+    {
+      auto sphere = std::make_shared<SphereCollider>(
+        std::make_shared<Sphere>(1.0f));
+      auto sphereRB = std::make_shared<RigidBody>(sphere, 10.0, 0.99);
+      sphereRB->translateBy(glm::vec3(0.0, 0.0, 5.0));
+      sphereRB->addForce(RigidBody::ExternalForce // Gravity
+                         {
+                           glm::vec3(0.0, 0.0, 0.0), // Position
+                           glm::vec3(0.0, 0.0, -9.81) // Force
+                           * sphereRB->getMass()
+                         });
+      m_scene->addChild(sphereRB);
+    }
+  }
 
   m_renderer->start(m_scene.get());
 }

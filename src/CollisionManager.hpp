@@ -349,7 +349,7 @@ namespace CollisionUtils
     return std::make_pair(*resultAB, *resultBA);
   }
 
-  // Sphere Definitions ------------------------------------------------------------------------------
+  // Sphere Definitions ---------------------------------------------------------------------------
   template <>
   inline int priority<SphereCollider>()
   {
@@ -384,11 +384,45 @@ namespace CollisionUtils
     return std::make_pair(
       CollisionBodyData
       {
-        pos, - normal
+        pos, -normal
       },
       CollisionBodyData
       {
         pos, normal
+      });
+  }
+
+  // Physical Intersections -----------------------------------------------------------------------
+  template <>
+  inline CollisionResult internalCompute<BoxCollider, SphereCollider>(BoxCollider* box, SphereCollider* sphere)
+  {
+    glm::mat4 sphereL2W = sphere->localToWorld();
+    glm::vec3 sphereCenter = sphereL2W[3];
+
+    glm::mat4 boxL2W = box->localToWorld();
+    glm::vec3 sphereCenterInBox = glm::inverse(boxL2W) * glm::vec4(sphereCenter, 1.0);
+
+    glm::vec3 boxHalfScale = box->getScale() * 0.5f;
+    glm::vec3 projection = glm::clamp(sphereCenterInBox, -boxHalfScale, boxHalfScale);
+
+    glm::vec3 contactPoint = boxL2W * glm::vec4(projection, 1.0);
+    glm::vec3 offset = sphereCenter - contactPoint;
+
+    if (glm::length(offset) > sphere->getRadius())
+    {
+      return std::nullopt;
+    }
+
+    glm::vec3 normal = glm::normalize(offset);
+
+    return std::make_pair(
+      CollisionBodyData
+      {
+        contactPoint, normal
+      },
+      CollisionBodyData
+      {
+        contactPoint, -normal
       });
   }
 }
