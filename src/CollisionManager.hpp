@@ -365,10 +365,10 @@ namespace CollisionUtils
     const glm::mat4 localToWorldSphere1 = sphere1->localToWorld();
     const glm::mat4 localToWorldSphere2 = sphere2->localToWorld();
 
-    const glm::vec3 centerSphere1 = glm::vec3(localToWorldSphere1[3][0], localToWorldSphere1[3][1], localToWorldSphere1[3][2]);
-    const glm::vec3 centerSphere2 = glm::vec3(localToWorldSphere2[3][0], localToWorldSphere2[3][1], localToWorldSphere2[3][2]);
+    const glm::vec3 centerSphere1 = localToWorldSphere1[3];
+    const glm::vec3 centerSphere2 = localToWorldSphere2[3];
 
-    float distBetweenCenters = glm::length(centerSphere1 - centerSphere2);
+    float distBetweenCenters = glm::length(centerSphere2 - centerSphere1);
     float radiusesSum = radiusSphere1 + radiusSphere2;
 
     if (distBetweenCenters > radiusesSum)
@@ -376,7 +376,7 @@ namespace CollisionUtils
       return std::nullopt;
     } 
 
-    glm::vec3 normal = glm::normalize(centerSphere1 - centerSphere2);
+    glm::vec3 normal = glm::normalize(centerSphere2 - centerSphere1);
     glm::vec3 pos1 = centerSphere1 + (radiusSphere1 / distBetweenCenters) * (centerSphere2 - centerSphere1);
     glm::vec3 pos2 = centerSphere2 + (radiusSphere2 / distBetweenCenters) * (centerSphere1 - centerSphere2);
     glm::vec3 pos = (pos1 + pos2) * 0.5f;
@@ -384,11 +384,11 @@ namespace CollisionUtils
     return std::make_pair(
       CollisionBodyData
       {
-        pos, -normal
+        pos, normal
       },
       CollisionBodyData
       {
-        pos, normal
+        pos, -normal
       });
   }
 
