@@ -223,13 +223,15 @@ namespace CollisionUtils
         }
       }
 
-      // Saving SAT
+      // Finding Previous SAT
       uint16_t prev_sat_result = bodyA->OBBSeparatingAxis.contains(bodyB) ? bodyA->OBBSeparatingAxis[bodyB] : 0;
-      bodyA->OBBSeparatingAxis[bodyB] = sat_result;
 
       // No Intersection
       if (sat_result != (uint16_t) ~0)
       {
+        // Saving SAT
+        bodyA->OBBSeparatingAxis[bodyB] = sat_result;
+
         return std::nullopt;
       }
 
@@ -338,7 +340,7 @@ namespace CollisionUtils
       // Error
       else return std::nullopt;
 
-      std::cout << "Flag: " << flag << std::endl; //DEBUG
+      //std::cout << "Flag: " << flag << std::endl; //DEBUG
 
       // Sends out result
       return CollisionBodyData
