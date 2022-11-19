@@ -61,8 +61,9 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
          glm::dot(glm::cross(r2, n), invI2 * glm::cross(r2, n)));
       glm::vec3 j = impulse * n;
       
+      body1->m_position += n * result.second.first.penetration;
       body1->m_nextLinearVelocity -= j / m1;
-      body1->m_nextAngularMomentum += invI1 * glm::cross(j, r1);
+      body1->m_nextAngularMomentum -= invI1 * glm::cross(j, r1);
     }
   }
 }

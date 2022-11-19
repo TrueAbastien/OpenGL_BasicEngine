@@ -111,7 +111,11 @@ namespace CollisionUtils
       };
 
       // Is Overlapping on the specified Axis
-      auto isOverlapping = [&](const glm::vec3& axis, const Vertices& A, const Vertices& B, float& s) -> bool
+      auto isOverlapping = [&](const glm::vec3& axis,
+                               const Vertices& A,
+                               const Vertices& B,
+                               float& s,
+                               float& overlap) -> bool
       {
         Interval iA = projInterval(axis, A);
         Interval iB = projInterval(axis, B);
@@ -120,12 +124,13 @@ namespace CollisionUtils
         {
           if (iA.second <= iB.second) // B Contains A
           {
+            overlap = iA.second - iA.first;
             s = 0.0f;
             return true;
           }
           if (iA.first <= iB.second) // A Above B
           {
-            //s = -1.0f;
+            overlap = iB.second - iA.first;
             s = 1.0f;
             return true;
           }
@@ -134,12 +139,13 @@ namespace CollisionUtils
         {
           if (iB.second <= iA.second) // A Contains B
           {
+            overlap = iB.second - iB.first;
             s = 0.0f;
             return true;
           }
           if (iB.first <= iA.second) // B Above A
           {
-            //s = 1.0f;
+            overlap = iA.second - iB.first;
             s = -1.0f;
             return true;
           }
@@ -183,15 +189,16 @@ namespace CollisionUtils
       Vertices A_vertices = getVertices(bodyA, A);
       Vertices B_vertices = getVertices(bodyB, B);
 
-      std::array<float, 15> sigmas;
-      float s;
+      std::array<float, 15> sigmas, overlaps;
+      float sigma, overlap;
 
       uint16_t sat_result = 1;
       size_t sat_index = 0;
 
       auto bindNext = [&](bool r)
       {
-        sigmas[sat_index] = s;
+        sigmas[sat_index] = sigma;
+        overlaps[sat_index] = overlap;
 
         if (r) sat_result |= (1 << (++sat_index));
         else sat_index++;
@@ -200,11 +207,11 @@ namespace CollisionUtils
       // Face Axis
       for (size_t i = 0; i < 3; ++i)
       {
-        bindNext(isOverlapping(-col(A, i), A_vertices, B_vertices, s));
+        bindNext(isOverlapping(-col(A, i), A_vertices, B_vertices, sigma, overlap));
       }
       for (size_t j = 0; j < 3; ++j)
       {
-        bindNext(isOverlapping(col(B, j), A_vertices, B_vertices, s));
+        bindNext(isOverlapping(col(B, j), A_vertices, B_vertices, sigma, overlap));
       }
 
       // Edge Axis
@@ -212,7 +219,7 @@ namespace CollisionUtils
       {
         for (size_t j = 0; j < 3; ++j)
         {
-          bindNext(isOverlapping(glm::cross(col(A, i), col(B, j)), A_vertices, B_vertices, s));
+          bindNext(isOverlapping(glm::cross(col(A, i), col(B, j)), A_vertices, B_vertices, sigma, overlap));
         }
       }
 
@@ -246,7 +253,7 @@ namespace CollisionUtils
       }
 
       // Compute Position/Normal
-      s = sigmas[flag - 1];
+      float s = sigmas[flag - 1];
 
       // - A Axis
       if (flag >= 1 && flag <= 3)
@@ -336,7 +343,9 @@ namespace CollisionUtils
       // Sends out result
       return CollisionBodyData
       {
-        pos, A2B_normal
+        pos, // Position
+        A2B_normal, // Normal
+        overlaps[flag - 1] // Penetration
       };
     };
 
@@ -381,14 +390,16 @@ namespace CollisionUtils
     glm::vec3 pos2 = centerSphere2 + (radiusSphere2 / distBetweenCenters) * (centerSphere1 - centerSphere2);
     glm::vec3 pos = (pos1 + pos2) * 0.5f;
 
+    float penetration = radiusesSum - distBetweenCenters;
+
     return std::make_pair(
       CollisionBodyData
       {
-        pos, normal
+        pos, normal, penetration
       },
       CollisionBodyData
       {
-        pos, -normal
+        pos, -normal, penetration
       });
   }
 
@@ -414,15 +425,16 @@ namespace CollisionUtils
     }
 
     glm::vec3 normal = glm::normalize(offset);
+    float penetration = glm::length(offset) - sphere->getRadius();
 
     return std::make_pair(
       CollisionBodyData
       {
-        contactPoint, normal
+        contactPoint, normal, penetration
       },
       CollisionBodyData
       {
-        contactPoint, -normal
+        contactPoint, -normal, penetration
       });
   }
 }

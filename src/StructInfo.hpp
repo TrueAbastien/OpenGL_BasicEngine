@@ -14,6 +14,7 @@ struct CollisionBodyData
 {
   glm::vec3 worldPosition;
   glm::vec3 normal;
+  float penetration;
 };
 using CollisionManifold = std::pair<CollisionBodyData, CollisionBodyData>;
 // - Optional on Collision (inexistant means no Collision)
