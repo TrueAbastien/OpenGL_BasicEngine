@@ -41,6 +41,9 @@ public:
   void translateBy(const glm::vec3& trsl);
   void rotateBy(const glm::vec3& rot);
 
+  void setInitLinearVelocity(glm::vec3 initLinearVelocity);
+  void setInitAngularMomentum(glm::vec3 initAngularMomentum);
+
 protected:
   void initialize(Renderer* renderer) override;
 
