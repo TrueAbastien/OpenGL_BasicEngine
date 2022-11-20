@@ -154,12 +154,56 @@ PendulumApplication::PendulumApplication()
 
     {
       auto box = std::make_shared<BoxCollider>(
-        std::make_shared<Box>(glm::vec3(1.0f)));
+        std::make_shared<Box>(glm::vec3(1.0f, 1.0f, 2.0f)));
       auto boxRB = std::make_shared<RigidBody>(box, 10.0, 0.5, false, true);
-      boxRB->translateBy(glm::vec3(0.0, 0.0, 5.0));
+      boxRB->translateBy(glm::vec3(0.0, 2.0, 5.0));
       m_scene->addChild(boxRB);
     }
   }
+
+  //{
+  //  // Ground
+  //  {
+  //    auto ground = std::make_shared<BoxCollider>(
+  //      std::make_shared<Box>(glm::vec3(3.0, 20.0, 0.5)));
+  //    auto groundRB = std::make_shared<RigidBody>(ground, 1e+6, 0.0, true, false);
+  //    groundRB->translateBy(glm::vec3(0.0, 0.0, -3.0));
+  //    m_scene->addChild(groundRB);
+  //  }
+
+  //  // Ball
+  //  {
+  //    auto ball = std::make_shared<SphereCollider>(
+  //      std::make_shared<Sphere>(1.0));
+  //    auto ballRB = std::make_shared<RigidBody>(ball, 10.0, 0.2, false, true);
+  //    ballRB->translateBy(glm::vec3(0.0, -10.0, -2.0));
+  //    ballRB->addForce(RigidBody::ExternalForce
+  //                     {
+  //                       glm::vec3(0.0), // Position
+  //                       glm::vec3(0.0, 10.0, 0.0) // Force
+  //                     });
+  //    m_scene->addChild(ballRB);
+  //  }
+
+  //  // Bowling Pin
+  //  {
+  //    auto makePin = [&](glm::vec2 pos)
+  //    {
+  //      auto pin = std::make_shared<BoxCollider>(
+  //        std::make_shared<Box>(glm::vec3(0.5, 0.5, 2)));
+  //      auto pinRB = std::make_shared<RigidBody>(pin, 2.0, 0.2, false, true);
+  //      pinRB->translateBy(glm::vec3(pos.x, 5.0 + pos.y, -1.0));
+  //      m_scene->addChild(pinRB);
+  //    };
+
+  //    //makePin(glm::vec2(0.0, 0.0));  // 001
+  //    //makePin(glm::vec2(0.5, 1.0));  // 002
+  //    //makePin(glm::vec2(-0.5, 1.0)); // 003
+  //    //makePin(glm::vec2(1.0, 2.0));  // 004
+  //    //makePin(glm::vec2(0.0, 2.0));  // 005
+  //    //makePin(glm::vec2(-1.0, 2.0)); // 006
+  //  }
+  //}
 
   m_renderer->start(m_scene.get());
 }
