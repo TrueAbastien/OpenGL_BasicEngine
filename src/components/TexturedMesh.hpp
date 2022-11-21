@@ -13,7 +13,8 @@ public:
   };
 
 public:
-  TexturedMesh(const std::string& objFile, const std::string& texFile);
+  TexturedMesh(const std::string& objFile, const std::string& texFile,
+               float scale = 1.0f, glm::vec3 offset = glm::vec3(0.0), glm::vec3 rot = glm::vec3(0.0));
 
 protected:
   void beforeInitialize(Renderer* renderer) override;

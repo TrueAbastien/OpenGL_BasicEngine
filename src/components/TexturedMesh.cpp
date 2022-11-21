@@ -14,9 +14,16 @@
 #include <algorithm>
 #include <array>
 
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/matrix_operation.hpp>
+#include <glm/gtx/polar_coordinates.hpp>
+#include <glm/gtc/matrix_transform.hpp>
+#include <glm/gtx/transform.hpp>
+
 // ------------------------------------------------------------------------------------------------
-TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFile)
-  : vertexShader(SHADER_DIR "/texture.vert", GL_VERTEX_SHADER), // TODO: change shader
+TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFile,
+                           float scale, glm::vec3 offset, glm::vec3 rot)
+  : vertexShader(SHADER_DIR "/texture.vert", GL_VERTEX_SHADER),
   fragmentShader(SHADER_DIR "/texture.frag", GL_FRAGMENT_SHADER),
   shaderProgram({vertexShader, fragmentShader}),
   m_texfilePath(RESSOURCES_DIR + texFile)
@@ -36,6 +43,12 @@ TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFil
   std::vector<SymbolV> vertices;
   std::vector<SymbolVt> textures;
   std::vector<SymbolF> faces;
+
+  glm::mat4 tr =
+    glm::rotate(rot.x, glm::vec3(1.0, 0.0, 0.0)) *
+    glm::rotate(rot.y, glm::vec3(0.0, 1.0, 0.0)) *
+    glm::rotate(rot.z, glm::vec3(0.0, 0.0, 1.0));
+  tr = glm::translate(glm::mat4(1.0), offset) * glm::scale(tr, glm::vec3(scale));
 
   for (std::string line; std::getline(obj, line); )
   {
@@ -84,7 +97,7 @@ TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFil
 
       if (values.size() != 3) return;
 
-      vertices.push_back(glm::vec3(values[0], values[1], values[2]));
+      vertices.push_back(tr * glm::vec4(values[0], values[1], values[2], 1.0f));
     }
 
     // Normals
