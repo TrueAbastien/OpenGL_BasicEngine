@@ -52,6 +52,8 @@ set(COMPONENT_SOURCES
   Component.cpp
   Component.hpp
   EmptyTransform.hpp
+  Mesh.cpp
+  Mesh.hpp
   Meshable.cpp
   Meshable.hpp
   Physical.cpp
@@ -73,8 +75,18 @@ set(COMPONENT_SOURCES
 )
 list(TRANSFORM COMPONENT_SOURCES PREPEND "src/components/")
 
+set(VENDOR_SOURCES
+  stb_image.h
+)
+list(TRANSFORM VENDOR_SOURCES PREPEND "src/vendors/")
+
 # The main executable
-add_executable(${proj} ${MAIN_SOURCES} ${BUILDER_SOURCES} ${COMPONENT_SOURCES})
+add_executable(${proj}
+  ${MAIN_SOURCES}
+  ${BUILDER_SOURCES}
+  ${COMPONENT_SOURCES}
+  ${VENDOR_SOURCES}
+)
 
 set_property(TARGET ${proj} PROPERTY CXX_STANDARD 20)
 target_compile_options(${proj} PRIVATE -Wall)
