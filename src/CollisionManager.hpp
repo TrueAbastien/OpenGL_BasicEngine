@@ -394,7 +394,7 @@ namespace CollisionUtils
     glm::vec3 pos2 = centerSphere2 + (radiusSphere2 / distBetweenCenters) * (centerSphere1 - centerSphere2);
     glm::vec3 pos = (pos1 + pos2) * 0.5f;
 
-    float penetration = radiusesSum - distBetweenCenters;
+    float penetration = distBetweenCenters - radiusesSum;
 
     return std::make_pair(
       CollisionBodyData

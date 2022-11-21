@@ -128,6 +128,18 @@ bool RigidBody::useGravity() const
 }
 
 // ------------------------------------------------------------------------------------------------
+void RigidBody::setInitLinearVelocity(glm::vec3 initLinearVelocity)
+{
+  m_nextLinearVelocity = initLinearVelocity;
+}
+
+// ------------------------------------------------------------------------------------------------
+void RigidBody::setInitAngularMomentum(glm::vec3 initAngularMomentum)
+{
+  m_nextAngularMomentum = initAngularMomentum;
+}
+
+// ------------------------------------------------------------------------------------------------
 void RigidBody::translateBy(const glm::vec3& trsl)
 {
   m_position += trsl;
