@@ -4,7 +4,7 @@
 #include "CollisionManager.hpp"
 
 // ------------------------------------------------------------------------------------------------
-Physical::Physical(const std::shared_ptr<Meshable>& target)
+Physical::Physical(const std::shared_ptr<Component>& target)
   : Meshable(), m_body(nullptr)
 {
   Renderable::mode = GL_LINES;

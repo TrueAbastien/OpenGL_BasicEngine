@@ -170,6 +170,12 @@ TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFil
 }
 
 // ------------------------------------------------------------------------------------------------
+std::vector<TexturedMesh::VertexTextured> TexturedMesh::getVertices() const
+{
+  return m_vertices;
+}
+
+// ------------------------------------------------------------------------------------------------
 void TexturedMesh::beforeInitialize(Renderer* renderer)
 {
   // Read Tex File

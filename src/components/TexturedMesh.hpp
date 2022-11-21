@@ -16,6 +16,8 @@ public:
   TexturedMesh(const std::string& objFile, const std::string& texFile,
                float scale = 1.0f, glm::vec3 offset = glm::vec3(0.0), glm::vec3 rot = glm::vec3(0.0));
 
+  std::vector<VertexTextured> getVertices() const;
+
 protected:
   void beforeInitialize(Renderer* renderer) override;
   void beforeUpdate(Renderer* renderer, UpdateData& data) override;
