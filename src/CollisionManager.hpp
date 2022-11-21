@@ -342,7 +342,7 @@ namespace CollisionUtils
       // Error
       else return std::nullopt;
 
-      //std::cout << "Flag: " << flag << std::endl; //DEBUG
+      if (flag > 6) std::cout << "Flag: " << flag << std::endl; //DEBUG
 
       // Sends out result
       return CollisionBodyData

@@ -49,14 +49,14 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
       glm::vec3 r1 = result.second.first.worldPosition - glm::vec3(body1->localToWorld()[3]);
       glm::vec3 r2 = result.second.second.worldPosition - glm::vec3(body2->localToWorld()[3]);
 
+      glm::mat3 invI1 = body1->getInvI();
+      glm::mat3 invI2 = body2->getInvI();
+
       glm::vec3 v1 = body1->m_currLinearVelocity;
       glm::vec3 w1 = body1->m_currAngularMomentum;
       glm::vec3 v2 = body2->m_currLinearVelocity;
       glm::vec3 w2 = body2->m_currAngularMomentum;
       glm::vec3 n = glm::normalize(result.second.first.normal);
-
-      glm::mat3 invI1 = body1->getInvI();
-      glm::mat3 invI2 = body2->getInvI();
 
       float m1 = body1->m_mass;
       float m2 = body2->m_mass;
@@ -70,7 +70,7 @@ void CollisionSolver::beforeUpdate(Renderer* renderer, UpdateData& data)
 
       body1->m_position += n * result.second.first.penetration;
       body1->m_nextLinearVelocity -= j / m1;
-      body1->m_nextAngularMomentum -= invI1 * glm::cross(j, r1);
+      body1->m_nextAngularMomentum -= /*invI1 **/ glm::cross(j, r1);
     }
   }
 }

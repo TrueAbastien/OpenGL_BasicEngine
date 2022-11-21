@@ -179,7 +179,7 @@ PendulumApplication::PendulumApplication()
       ballRB->translateBy(glm::vec3(0.0, -10.0, -2.0));
       ballRB->addForce(RigidBody::ExternalForce
                        {
-                         glm::vec3(0.0), // Position
+                         glm::vec3(0.0, 0.0, 0.3), // Position
                          glm::vec3(0.0, 10.0, 0.0) // Force
                        });
       m_scene->addChild(ballRB);
@@ -190,9 +190,9 @@ PendulumApplication::PendulumApplication()
       auto makePin = [&](glm::vec2 pos)
       {
         auto pin = std::make_shared<BoxCollider>(
-          std::make_shared<Box>(glm::vec3(0.5, 0.5, 2)));
-        auto pinRB = std::make_shared<RigidBody>(pin, 2.0, 0.2, false, true);
-        pinRB->translateBy(glm::vec3(pos.x, 5.0 + pos.y, -1.0));
+          std::make_shared<Box>(glm::vec3(0.5, 0.5, 3)));
+        auto pinRB = std::make_shared<RigidBody>(pin, 5.0, 0.2, false, true);
+        pinRB->translateBy(glm::vec3(pos.x, 5.0 + pos.y, 0.0));
         m_scene->addChild(pinRB);
       };
 
