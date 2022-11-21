@@ -1,4 +1,4 @@
-#include "Mesh.hpp"
+#include "TexturedMesh.hpp"
 
 #include "asset.hpp"
 
@@ -15,15 +15,15 @@
 #include <array>
 
 // ------------------------------------------------------------------------------------------------
-Mesh::Mesh(const std::string& objFile, const std::string& texFile)
-  : vertexShader(SHADER_DIR "/shader.vert", GL_VERTEX_SHADER), // TODO: change shader
-  fragmentShader(SHADER_DIR "/shader.frag", GL_FRAGMENT_SHADER),
+TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFile)
+  : vertexShader(SHADER_DIR "/texture.vert", GL_VERTEX_SHADER), // TODO: change shader
+  fragmentShader(SHADER_DIR "/texture.frag", GL_FRAGMENT_SHADER),
   shaderProgram({vertexShader, fragmentShader}),
-  m_texfilePath(texFile)
+  m_texfilePath(RESSOURCES_DIR + texFile)
 {
 
   // Read OBJ File
-  std::ifstream obj(objFile);
+  std::ifstream obj(RESSOURCES_DIR + objFile);
   if (!obj.is_open()) return;
 
   using SymbolVn = glm::vec3;
@@ -64,7 +64,7 @@ Mesh::Mesh(const std::string& objFile, const std::string& texFile)
 
       if (vtxIndexes.size() < 3) return;
 
-      for (int jj = 0; jj < indexes.size() - 2; ++jj)
+      for (int jj = 0; jj < vtxIndexes.size() - 2; ++jj)
       {
         faces.push_back(SymbolF{vtxIndexes[0], vtxIndexes[jj + 1], vtxIndexes[jj + 2]});
       }
@@ -152,10 +152,12 @@ Mesh::Mesh(const std::string& objFile, const std::string& texFile)
       travelingIndex++;
     }
   }
+
+  m_nFaces = faces.size();
 }
 
 // ------------------------------------------------------------------------------------------------
-void Mesh::beforeInitialize(Renderer* renderer)
+void TexturedMesh::beforeInitialize(Renderer* renderer)
 {
   // Read Tex File
   {
@@ -213,8 +215,8 @@ void Mesh::beforeInitialize(Renderer* renderer)
                              offsetof(VertexTextured, position));
   shaderProgram.setAttribute("normal", 3, sizeof(VertexTextured),
                              offsetof(VertexTextured, normal));
-  shaderProgram.setAttribute("texture", 2, sizeof(VertexTextured),
-                             offsetof(VertexTextured, texture));
+  shaderProgram.setAttribute("uv", 2, sizeof(VertexTextured),
+                             offsetof(VertexTextured, uv));
 
   // bind the ibo
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
@@ -224,9 +226,36 @@ void Mesh::beforeInitialize(Renderer* renderer)
 }
 
 // ------------------------------------------------------------------------------------------------
-void Mesh::beforeUpdate(Renderer* renderer, UpdateData& data)
+void TexturedMesh::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
-  Meshable::updateRenderable(renderer, data.localToWorld,
-                             m_nFaces * // Faces amount
-                             3); // Values amount
+  shaderProgram.use();
+
+  shaderProgram.setUniform("tex", 0);
+
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, m_texture);
+
+  // send uniforms
+  shaderProgram.setUniform("projection", renderer->getProjection());
+  shaderProgram.setUniform("view", renderer->getView() * data.localToWorld);
+
+  glCheckError(__FILE__, __LINE__);
+
+  glBindVertexArray(vao);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vbo);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ibo);
+
+  glCheckError(__FILE__, __LINE__);
+  glDrawElements(GL_TRIANGLES,     // mode
+                 m_nFaces * 3,     // count
+                 GL_UNSIGNED_INT,  // type
+                 NULL              // element array buffer offset
+  );
+
+  glBindVertexArray(0);
+  
+  // TODO: unbind texture ?
+
+  shaderProgram.unuse();
 }

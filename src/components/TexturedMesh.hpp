@@ -2,18 +2,18 @@
 
 #include "Component.hpp"
 
-class Mesh final : public Component
+class TexturedMesh final : public Component
 {
 public:
   struct VertexTextured
   {
     glm::vec3 position;
     glm::vec3 normal;
-    glm::vec2 texture;
+    glm::vec2 uv;
   };
 
 public:
-  Mesh(const std::string& objFile, const std::string& texFile);
+  TexturedMesh(const std::string& objFile, const std::string& texFile);
 
 protected:
   void beforeInitialize(Renderer* renderer) override;

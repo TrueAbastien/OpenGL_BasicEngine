@@ -14,6 +14,7 @@
 #include "components/RigidBody.hpp"
 #include "components/Box.hpp"
 #include "components/Sphere.hpp"
+#include "components/TexturedMesh.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -202,6 +203,13 @@ PendulumApplication::PendulumApplication()
       makePin(glm::vec2(1.0, 2.0));  // 004
       makePin(glm::vec2(0.0, 2.0));  // 005
       makePin(glm::vec2(-1.0, 2.0)); // 006
+    }
+
+    // TEST //
+    {
+      auto mesh = std::make_shared<TexturedMesh>("/mesh/pin.obj", "/texture/bowling.jpg");
+      mesh->setLocalToParent(glm::vec3(0.0, 0.0, 5.0));
+      m_scene->addChild(mesh);
     }
   }
 

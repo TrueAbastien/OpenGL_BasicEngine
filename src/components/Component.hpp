@@ -19,8 +19,8 @@ public:
 
 public:
   void setLocalToParent(const glm::mat4& model);
-  void setLocalToParent(const glm::vec3& trsl = glm::vec3(),
-                        const glm::vec3& rot = glm::vec3());
+  void setLocalToParent(const glm::vec3& trsl = glm::vec3(0.0),
+                        const glm::vec3& rot = glm::vec3(0.0));
   glm::mat4 getLocalToParent() const;
 
   bool addChild(const Pointer& child);

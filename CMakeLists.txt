@@ -52,8 +52,6 @@ set(COMPONENT_SOURCES
   Component.cpp
   Component.hpp
   EmptyTransform.hpp
-  Mesh.cpp
-  Mesh.hpp
   Meshable.cpp
   Meshable.hpp
   Physical.cpp
@@ -70,6 +68,8 @@ set(COMPONENT_SOURCES
   SphereCollider.hpp
   Tetrahedron.cpp
   Tetrahedron.hpp
+  TexturedMesh.cpp
+  TexturedMesh.hpp
   World.cpp
   World.hpp
 )
