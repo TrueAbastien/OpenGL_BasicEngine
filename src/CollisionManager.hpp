@@ -268,7 +268,7 @@ namespace CollisionUtils
         pos = col(B, 3);
         for (size_t j = 0; j < 3; ++j)
         {
-          pos -= col(B, j) * sigmas[j] * glm::sign(C[i][j]) * b[j];
+          pos -= col(B, j) * sigmas[j] * b[j];
         }
 
         // Normal
@@ -284,7 +284,7 @@ namespace CollisionUtils
         pos = col(A, 3);
         for (size_t i = 0; i < 3; ++i)
         {
-          pos += col(A, i) * sigmas[i + 3] * glm::sign(C[i][j]) * a[i];
+          pos += col(A, i) * sigmas[i + 3] * a[i];
         }
 
         // Normal
