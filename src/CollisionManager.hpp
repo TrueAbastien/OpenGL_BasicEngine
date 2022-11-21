@@ -125,7 +125,8 @@ namespace CollisionUtils
           if (iA.second <= iB.second) // B Contains A
           {
             overlap = iA.second - iA.first;
-            s = 0.0f;
+            float dB = 0.5f * (iB.second - iB.first);
+            s = (overlap * 0.5f + iA.first - dB - iB.first) / dB;
             return true;
           }
           if (iA.first <= iB.second) // A Above B
@@ -140,7 +141,8 @@ namespace CollisionUtils
           if (iB.second <= iA.second) // A Contains B
           {
             overlap = iB.second - iB.first;
-            s = 0.0f;
+            float dA = 0.5f * (iA.second - iA.first);
+            s = (overlap * 0.5f + iB.first - dA - iA.first) / dA;
             return true;
           }
           if (iB.first <= iA.second) // B Above A
@@ -266,7 +268,7 @@ namespace CollisionUtils
         pos = col(B, 3);
         for (size_t j = 0; j < 3; ++j)
         {
-          pos -= col(B, j) * s * glm::sign(C[i][j]) * b[j];
+          pos -= col(B, j) * sigmas[j] * glm::sign(C[i][j]) * b[j];
         }
 
         // Normal
@@ -282,7 +284,7 @@ namespace CollisionUtils
         pos = col(A, 3);
         for (size_t i = 0; i < 3; ++i)
         {
-          pos += col(A, i) * s * glm::sign(C[i][j]) * a[i];
+          pos += col(A, i) * sigmas[i + 3] * glm::sign(C[i][j]) * a[i];
         }
 
         // Normal
