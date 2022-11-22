@@ -44,11 +44,11 @@ TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFil
   std::vector<SymbolVt> textures;
   std::vector<SymbolF> faces;
 
-  glm::mat4 tr =
+  glm::mat4 tr_rot =
     glm::rotate(rot.x, glm::vec3(1.0, 0.0, 0.0)) *
     glm::rotate(rot.y, glm::vec3(0.0, 1.0, 0.0)) *
     glm::rotate(rot.z, glm::vec3(0.0, 0.0, 1.0));
-  tr = glm::translate(glm::mat4(1.0), offset) * glm::scale(tr, glm::vec3(scale));
+  glm::mat4 tr = glm::translate(glm::mat4(1.0), offset) * glm::scale(tr_rot, glm::vec3(scale));
 
   for (std::string line; std::getline(obj, line); )
   {
@@ -114,7 +114,7 @@ TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFil
 
       if (values.size() != 3) return;
 
-      normals.push_back(glm::vec3(values[0], values[1], values[2]));
+      normals.push_back(tr_rot * glm::vec4(values[0], values[1], values[2], 0.0f));
     }
 
     // Textures
