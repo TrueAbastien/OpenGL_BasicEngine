@@ -22,6 +22,7 @@
 #include "scenes/BallpitScene.hpp"
 #include "scenes/SpinningBatScene.hpp"
 #include "scenes/DominoScene.hpp"
+#include "scenes/DynamicScene.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -50,6 +51,7 @@ MainApplication::MainApplication()
   m_scenes.push_back(std::make_unique<BallpitScene>());
   m_scenes.push_back(std::make_unique<SpinningBatScene>());
   m_scenes.push_back(std::make_unique<DominoScene>());
+  m_scenes.push_back(std::make_unique<DynamicScene>());
   // TO EXPAND
 }
 

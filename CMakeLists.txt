@@ -78,6 +78,7 @@ set(SCENE_SOURCES
   BowlingScene.hpp
   BowlsScene.hpp
   DominoScene.hpp
+  DynamicScene.hpp
   PoolScene.hpp
   SpinningBatScene.hpp
 )
