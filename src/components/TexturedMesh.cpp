@@ -63,7 +63,7 @@ TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFil
 
       while (!ss.eof())
       {
-        int i; ss >> i;
+        int i; ss >> std::skipws >> i;
         indexes.push_back(i);
       }
       
@@ -91,11 +91,11 @@ TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFil
 
       while (!ss.eof())
       {
-        float v; ss >> v;
+        float v; ss >> std::skipws >> v;
         values.push_back(v);
       }
 
-      if (values.size() != 3) return;
+      if (values.size() < 3) return;
 
       vertices.push_back(tr * glm::vec4(values[0], values[1], values[2], 1.0f));
     }
@@ -108,11 +108,11 @@ TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFil
 
       while (!ss.eof())
       {
-        float v; ss >> v;
+        float v; ss >> std::skipws >> v;
         values.push_back(v);
       }
 
-      if (values.size() != 3) return;
+      if (values.size() < 3) return;
 
       normals.push_back(tr_rot * glm::vec4(values[0], values[1], values[2], 0.0f));
     }
@@ -125,11 +125,11 @@ TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFil
 
       while (!ss.eof())
       {
-        float v; ss >> v;
+        float v; ss >> std::skipws >> v;
         values.push_back(v);
       }
 
-      if (values.size() != 2) return;
+      if (values.size() < 2) return;
 
       textures.push_back(glm::vec2(values[0], values[1]));
     }

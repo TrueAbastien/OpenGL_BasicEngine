@@ -18,5 +18,14 @@ public:
     return "SpinningBat";
   }
 
-  // TODO
+  void construct(Renderer* renderer) override
+  {
+    Scene::construct(renderer);
+
+    // Bat
+    {
+      auto bat = std::make_shared<TexturedMesh>("/mesh/bat.obj", "/texture/wood.jpg", 0.1);
+      addChild(bat);
+    }
+  }
 };
