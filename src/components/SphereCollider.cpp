@@ -55,7 +55,8 @@ SphereCollider::SphereCollider(const std::shared_ptr<Meshable>& target)
   }
 
   m_radius = infos->first;
-  m_localToParent = glm::translate(target->getLocalToParent(), infos->second);
+  //m_localToParent = glm::translate(target->getLocalToParent(), infos->second);
+  m_localToParent = target->getLocalToParent();
   target->setLocalToParent(glm::translate(glm::mat4(1.0), -infos->second));
 
   Meshable::makeMesh(makeMeshContent(
@@ -77,7 +78,8 @@ SphereCollider::SphereCollider(const std::shared_ptr<TexturedMesh>& mesh)
   }
 
   m_radius = infos->first;
-  m_localToParent = glm::translate(mesh->getLocalToParent(), infos->second);
+  //m_localToParent = glm::translate(mesh->getLocalToParent(), infos->second);
+  m_localToParent = mesh->getLocalToParent();
   mesh->setLocalToParent(glm::translate(glm::mat4(1.0), -infos->second));
 
 #ifdef _DEBUG
