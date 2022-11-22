@@ -79,12 +79,14 @@ BoxCollider::BoxCollider(const std::shared_ptr<TexturedMesh>& mesh)
   m_localToParent = glm::translate(mesh->getLocalToParent(), infos->second);
   mesh->setLocalToParent(glm::translate(glm::mat4(1.0), -infos->second));
 
+#ifdef _DEBUG
   Meshable::makeMesh(makeMeshContent(
     [](auto)
     {
       return glm::vec4(0.0, 1.0, 0.0, 0.1);
     }
   ));
+#endif
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -104,7 +106,9 @@ void BoxCollider::beforeInitialize(Renderer* renderer)
 // ------------------------------------------------------------------------------------------------
 void BoxCollider::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
+#ifdef _DEBUG
   Meshable::updateRenderable(renderer, data.localToWorld,
                              12 * // Lines on Cube
                              2);  // Values amount
+#endif
 }

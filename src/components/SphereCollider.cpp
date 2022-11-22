@@ -80,12 +80,14 @@ SphereCollider::SphereCollider(const std::shared_ptr<TexturedMesh>& mesh)
   m_localToParent = glm::translate(mesh->getLocalToParent(), infos->second);
   mesh->setLocalToParent(glm::translate(glm::mat4(1.0), -infos->second));
 
+#ifdef _DEBUG
   Meshable::makeMesh(makeMeshContent(
     [](auto)
     {
       return glm::vec4(0.0, 1.0, 0.0, 0.1);
     }
   ));
+#endif
 }
 
 // ------------------------------------------------------------------------------------------------
@@ -105,9 +107,11 @@ void SphereCollider::beforeInitialize(Renderer* renderer)
 // ------------------------------------------------------------------------------------------------
 void SphereCollider::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
+#ifdef _DEBUG
   Meshable::updateRenderable(renderer, data.localToWorld,
                              20 *     // Faces on icosahedron
                              4 * 4 *  // Divisions
                              3 *
                              2);      // Values
+#endif
 }
