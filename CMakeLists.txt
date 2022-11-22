@@ -74,7 +74,12 @@ set(COMPONENT_SOURCES
 list(TRANSFORM COMPONENT_SOURCES PREPEND "src/components/")
 
 set(SCENE_SOURCES
+  BallpitScene.hpp
   BowlingScene.hpp
+  BowlsScene.hpp
+  DominoScene.hpp
+  PoolScene.hpp
+  SpinningBatScene.hpp
 )
 list(TRANSFORM SCENE_SOURCES PREPEND "src/scenes/")
 

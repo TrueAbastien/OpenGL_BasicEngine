@@ -19,6 +19,9 @@
 #include "scenes/BowlingScene.hpp"
 #include "scenes/BowlsScene.hpp"
 #include "scenes/PoolScene.hpp"
+#include "scenes/BallpitScene.hpp"
+#include "scenes/SpinningBatScene.hpp"
+#include "scenes/DominoScene.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -44,6 +47,9 @@ MainApplication::MainApplication()
   m_scenes.push_back(std::make_unique<BowlingScene>());
   m_scenes.push_back(std::make_unique<BowlsScene>());
   m_scenes.push_back(std::make_unique<PoolScene>());
+  m_scenes.push_back(std::make_unique<BallpitScene>());
+  m_scenes.push_back(std::make_unique<SpinningBatScene>());
+  m_scenes.push_back(std::make_unique<DominoScene>());
   // TO EXPAND
 }
 
