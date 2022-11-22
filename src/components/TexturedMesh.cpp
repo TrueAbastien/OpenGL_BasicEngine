@@ -28,7 +28,6 @@ TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFil
   shaderProgram({vertexShader, fragmentShader}),
   m_texfilePath(RESSOURCES_DIR + texFile)
 {
-
   // Read OBJ File
   std::ifstream obj(RESSOURCES_DIR + objFile);
   if (!obj.is_open()) return;
@@ -67,10 +66,11 @@ TexturedMesh::TexturedMesh(const std::string& objFile, const std::string& texFil
         indexes.push_back(i);
       }
       
-      if (indexes.size() % 3 != 0) return;
+      int size = indexes.size();
+      size -= (size % 3);
 
       std::vector<SubSymbolF> vtxIndexes(0);
-      for (int ii = 0; ii < indexes.size(); ii += 3)
+      for (int ii = 0; ii < size; ii += 3)
       {
         vtxIndexes.push_back(SubSymbolF{indexes[ii], indexes[ii + 1], indexes[ii + 2]});
       }
