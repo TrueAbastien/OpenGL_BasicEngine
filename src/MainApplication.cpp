@@ -17,6 +17,8 @@
 #include "components/TexturedMesh.hpp"
 
 #include "scenes/BowlingScene.hpp"
+#include "scenes/BowlsScene.hpp"
+#include "scenes/PoolScene.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -40,6 +42,8 @@ MainApplication::MainApplication()
 
   // Create Scenes
   m_scenes.push_back(std::make_unique<BowlingScene>());
+  m_scenes.push_back(std::make_unique<BowlsScene>());
+  m_scenes.push_back(std::make_unique<PoolScene>());
   // TO EXPAND
 
   // RigidBody
