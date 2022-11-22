@@ -12,12 +12,12 @@ class BowlingScene final : public Scene
 public:
   BowlingScene() = default;
 
-  const char* getName() const
+  const char* getName() const override
   {
     return "Bowling";
   }
 
-  void construct(Renderer* renderer)
+  void construct(Renderer* renderer) override
   {
     Scene::construct(renderer); // IMPORTANT
 
