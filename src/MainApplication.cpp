@@ -23,7 +23,7 @@
 #include "imgui_impl_opengl3.h"
 
 MainApplication::MainApplication()
-    : Application(), m_currentSceneIndex(0), m_scenes(0)
+    : Application(), m_currentSceneIndex(0), m_scenes(0), m_isPaused(false)
 {
   m_renderer = std::make_unique<Renderer>(window);
 
@@ -269,8 +269,7 @@ void MainApplication::loop() {
   ImGui::NewFrame();
 
   UpdateData data;
-  //data.dt = getFrameDeltaTime();
-  data.dt = h_step;
+  data.dt = m_isPaused ? 0.0f : h_step;
   data.t = getTime();
 
   if (m_currentSceneIndex > 0 && m_currentSceneIndex <= m_scenes.size())
@@ -281,21 +280,31 @@ void MainApplication::loop() {
   // GUI Frame
   {
     ImGui::Begin("Scene Manager");
+
+    // Scene Selector
     {
-      int nextCSI = m_currentSceneIndex;
       std::vector<const char*> names = {"--none--"};
       std::transform(m_scenes.begin(), m_scenes.end(), std::back_inserter(names), [](const std::unique_ptr<Scene>& scene)
                      {
                        return scene->getName();
                      });
 
-      ImGui::ListBox("Scene", &nextCSI, names.data(), m_scenes.size() + 1, 3);
-
-      if (nextCSI != m_currentSceneIndex)
+      if (ImGui::ListBox("Scene", &m_currentSceneIndex, names.data(), m_scenes.size() + 1, 3))
       {
-        selectScene(nextCSI);
+        selectScene(m_currentSceneIndex);
       }
     }
+
+    // Time Management
+    {
+      if (ImGui::Button("Restart"))
+      {
+        selectScene(m_currentSceneIndex);
+      }
+
+      ImGui::Checkbox("Paused", &m_isPaused);
+    }
+
     ImGui::End();
   }
 

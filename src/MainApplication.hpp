@@ -24,4 +24,7 @@ private:
 
   std::vector<std::unique_ptr<Scene>> m_scenes;
   int m_currentSceneIndex;
+
+  // Time Manager
+  bool m_isPaused;
 };

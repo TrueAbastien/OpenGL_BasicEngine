@@ -146,7 +146,7 @@ void Camera::beforeInitialize(Renderer* renderer)
 void Camera::beforeUpdate(Renderer* renderer, UpdateData& data)
 {
   // Process Inputs
-  inputCallback(renderer->getWindow(), data.dt);
+  inputCallback(renderer->getWindow(), h_step);
 
   // Update Transforms
   glm::mat4 mat = computeView();
