@@ -4,8 +4,6 @@
 #include "components/BoxCollider.hpp"
 #include "components/SphereCollider.hpp"
 
-#include "GJK.hpp"
-
 #include <algorithm>
 #include <vector>
 #include <numeric>
@@ -456,6 +454,7 @@ public:
 
   bool addPhysical(Physical* physical);
   bool removePhysical(Physical* physical);
+  void clearAll();
 
   template <CollisionUtils::PhysicalDerived T>
   Result computeTargetCollisions(T* target);

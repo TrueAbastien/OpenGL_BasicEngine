@@ -69,6 +69,12 @@ bool Component::removeChild(int index)
 }
 
 // ------------------------------------------------------------------------------------------------
+void Component::removeChildren()
+{
+  m_children.clear();
+}
+
+// ------------------------------------------------------------------------------------------------
 Component::Pointer Component::getChild(int index) const
 {
   if (index < 0 || index >= m_children.size())

@@ -3,10 +3,14 @@
 #include "Component.hpp"
 #include "Camera.hpp"
 
-class Scene final : public Component
+class Scene : public Component
 {
+protected:
+  Scene() = default;
+
 public:
-  Scene(Renderer* renderer);
+  virtual const char* getName() const = 0;
+  virtual void construct(Renderer* renderer);
 
 protected:
   void beforeInitialize(Renderer* renderer) override;

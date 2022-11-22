@@ -26,6 +26,7 @@ public:
   bool addChild(const Pointer& child);
   bool removeChild(const Pointer& child);
   bool removeChild(int index);
+  void removeChildren();
   Pointer getChild(int index) const;
   Collection getChildren() const;
   bool containsChild(const Pointer& child) const;

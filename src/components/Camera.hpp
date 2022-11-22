@@ -6,6 +6,7 @@ class Camera final : public Component
 {
 public:
   Camera();
+  ~Camera();
 
 public:
   void processInput(unsigned char press, float dt);

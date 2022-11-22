@@ -46,6 +46,13 @@ bool CollisionManager::removePhysical(Physical* physical)
 }
 
 // ------------------------------------------------------------------------------------------------
+void CollisionManager::clearAll()
+{
+  m_colliders.clear();
+  m_cachedResults.clear();
+}
+
+// ------------------------------------------------------------------------------------------------
 CollisionManager::ResultMap CollisionManager::computeAllCollisions()
 {
   m_cachedResults.clear();

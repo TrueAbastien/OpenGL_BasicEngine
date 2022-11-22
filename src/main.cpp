@@ -1,8 +1,8 @@
 
-#include "PendulumApplication.hpp"
+#include "MainApplication.hpp"
 
 int main(int argc, const char* argv[]) {
-  PendulumApplication app;
+  MainApplication app;
   app.run();
   return 0;
 }

@@ -1,4 +1,4 @@
-#include "PendulumApplication.hpp"
+#include "MainApplication.hpp"
 
 #include <GLFW/glfw3.h>
 #include <glm/glm.hpp>
@@ -16,46 +16,16 @@
 #include "components/Sphere.hpp"
 #include "components/TexturedMesh.hpp"
 
+#include "scenes/BowlingScene.hpp"
+
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
 #include "imgui_impl_opengl3.h"
 
-class PendulumComponent final : public Box
-{
-public:
-  PendulumComponent(double _gravity, double _length, double _theta, double _mass)
-     : Box(glm::vec3(0.1, 0.1, _length)),
-       root_angular_velocity(_gravity / _length),
-       mass(_mass),
-       previous({_theta, 1.0})
-  {
-  }
-
-protected:
-  void beforeUpdate(Renderer* renderer, UpdateData& data) override
-  {
-    previous.second -= root_angular_velocity * glm::sin(previous.first) * data.dt;
-    previous.first += previous.second * data.dt;
-
-    m_localToParent = glm::rotate((float)previous.first, glm::vec3(-1.0, 0.0, 0.0));
-    m_localToParent = glm::translate(m_localToParent, glm::vec3(0.0, 0.0, -m_scale.z * 0.5));
-
-    data.localToWorld = data.parentToWorld * m_localToParent;
-    Box::beforeUpdate(renderer, data);
-  }
-  
-private:
- double root_angular_velocity;
- double mass;
-
- std::pair<double, double> previous;
-};
-
-PendulumApplication::PendulumApplication()
-    : Application()
+MainApplication::MainApplication()
+    : Application(), m_currentSceneIndex(0), m_scenes(0)
 {
   m_renderer = std::make_unique<Renderer>(window);
-  m_scene = std::make_unique<Scene>(m_renderer.get());
 
   glCheckError(__FILE__, __LINE__);
 
@@ -67,6 +37,10 @@ PendulumApplication::PendulumApplication()
 
   ImGui_ImplOpenGL3_Init();
   ImGui::StyleColorsDark();
+
+  // Create Scenes
+  m_scenes.push_back(std::make_unique<BowlingScene>());
+  // TO EXPAND
 
   // RigidBody
   /*
@@ -163,47 +137,47 @@ PendulumApplication::PendulumApplication()
   //}
 
   {
-    // Ground
-    {
-      auto ground = std::make_shared<BoxCollider>(
-        std::make_shared<Box>(glm::vec3(3.0, 20.0, 0.5)));
-      auto groundRB = std::make_shared<RigidBody>(ground, 1e+6, 0.0, true, false);
-      groundRB->translateBy(glm::vec3(0.0, 0.0, -3.0));
-      m_scene->addChild(groundRB);
-    }
+    //// Ground
+    //{
+    //  auto ground = std::make_shared<BoxCollider>(
+    //    std::make_shared<Box>(glm::vec3(3.0, 20.0, 0.5)));
+    //  auto groundRB = std::make_shared<RigidBody>(ground, 1e+6, 0.0, true, false);
+    //  groundRB->translateBy(glm::vec3(0.0, 0.0, -3.0));
+    //  m_scene->addChild(groundRB);
+    //}
 
-    // Ball
-    {
-      auto ball = std::make_shared<SphereCollider>(
-        std::make_shared<Sphere>(1.0));
-      auto ballRB = std::make_shared<RigidBody>(ball, 10.0, 0.2, false, true);
-      ballRB->translateBy(glm::vec3(0.0, -10.0, -2.0));
-      ballRB->addForce(RigidBody::ExternalForce
-                       {
-                         glm::vec3(0.0, 0.0, 0.3), // Position
-                         glm::vec3(0.0, 10.0, 0.0) // Force
-                       });
-      m_scene->addChild(ballRB);
-    }
+    //// Ball
+    //{
+    //  auto ball = std::make_shared<SphereCollider>(
+    //    std::make_shared<Sphere>(1.0));
+    //  auto ballRB = std::make_shared<RigidBody>(ball, 10.0, 0.2, false, true);
+    //  ballRB->translateBy(glm::vec3(0.0, -10.0, -2.0));
+    //  ballRB->addForce(RigidBody::ExternalForce
+    //                   {
+    //                     glm::vec3(0.0, 0.0, 0.3), // Position
+    //                     glm::vec3(0.0, 10.0, 0.0) // Force
+    //                   });
+    //  m_scene->addChild(ballRB);
+    //}
 
-    // Bowling Pin
-    {
-      auto makePin = [&](glm::vec2 pos)
-      {
-        auto pin = std::make_shared<BoxCollider>(
-          std::make_shared<Box>(glm::vec3(0.5, 0.5, 3)));
-        auto pinRB = std::make_shared<RigidBody>(pin, 5.0, 0.2, false, true);
-        pinRB->translateBy(glm::vec3(pos.x, 5.0 + pos.y, 0.0));
-        m_scene->addChild(pinRB);
-      };
+    //// Bowling Pin
+    //{
+    //  auto makePin = [&](glm::vec2 pos)
+    //  {
+    //    auto pin = std::make_shared<BoxCollider>(
+    //      std::make_shared<Box>(glm::vec3(0.5, 0.5, 3)));
+    //    auto pinRB = std::make_shared<RigidBody>(pin, 5.0, 0.2, false, true);
+    //    pinRB->translateBy(glm::vec3(pos.x, 5.0 + pos.y, 0.0));
+    //    m_scene->addChild(pinRB);
+    //  };
 
-      makePin(glm::vec2(0.0, 0.0));  // 001
-      makePin(glm::vec2(0.5, 1.0));  // 002
-      makePin(glm::vec2(-0.5, 1.0)); // 003
-      makePin(glm::vec2(1.0, 2.0));  // 004
-      makePin(glm::vec2(0.0, 2.0));  // 005
-      makePin(glm::vec2(-1.0, 2.0)); // 006
-    }
+    //  makePin(glm::vec2(0.0, 0.0));  // 001
+    //  makePin(glm::vec2(0.5, 1.0));  // 002
+    //  makePin(glm::vec2(-0.5, 1.0)); // 003
+    //  makePin(glm::vec2(1.0, 2.0));  // 004
+    //  makePin(glm::vec2(0.0, 2.0));  // 005
+    //  makePin(glm::vec2(-1.0, 2.0)); // 006
+    //}
 
     // TEST //
     /*{
@@ -222,17 +196,17 @@ PendulumApplication::PendulumApplication()
     }*/
   }
 
-  m_renderer->start(m_scene.get());
+  //m_renderer->start(m_scene.get());
 }
 
-PendulumApplication::~PendulumApplication()
+MainApplication::~MainApplication()
 {
   ImGui_ImplOpenGL3_Shutdown();
   ImGui_ImplGlfw_Shutdown();
   ImGui::DestroyContext();
 }
 
-void PendulumApplication::loop() {
+void MainApplication::loop() {
   // exit on window close button pressed
   if (glfwWindowShouldClose(getWindow()))
     exit();
@@ -255,14 +229,62 @@ void PendulumApplication::loop() {
   //data.dt = getFrameDeltaTime();
   data.dt = h_step;
   data.t = getTime();
-  m_renderer->update(m_scene.get(), data);
 
+  if (m_currentSceneIndex > 0 && m_currentSceneIndex <= m_scenes.size())
   {
-    // GUI Frame
-    //ImGui::ShowDemoWindow();
+    m_renderer->update(m_scenes[m_currentSceneIndex - 1].get(), data);
+  }
+
+  // GUI Frame
+  {
+    ImGui::Begin("Scene Manager");
+    {
+      int nextCSI = m_currentSceneIndex;
+      std::vector<const char*> names = {"--none--"};
+      std::transform(m_scenes.begin(), m_scenes.end(), std::back_inserter(names), [](const std::unique_ptr<Scene>& scene)
+                     {
+                       return scene->getName();
+                     });
+
+      ImGui::ListBox("Scene", &nextCSI, names.data(), m_scenes.size() + 1, 3);
+
+      if (nextCSI != m_currentSceneIndex)
+      {
+        selectScene(nextCSI);
+      }
+    }
+    ImGui::End();
   }
 
   // ImGui Render
   ImGui::Render();
   ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+}
+
+void MainApplication::selectScene(int index)
+{
+  if (index > m_scenes.size())
+  {
+    return;
+  }
+
+  clearCurrentScene();
+
+  m_currentSceneIndex = index;
+  if (index > 0)
+  {
+    auto& scene = m_scenes[m_currentSceneIndex - 1];
+    scene->construct(m_renderer.get());
+    m_renderer->start(scene.get());
+  }
+}
+
+void MainApplication::clearCurrentScene()
+{
+  m_renderer->getCollisionManager()->clearAll();
+
+  if (m_currentSceneIndex > 0)
+  {
+    m_scenes[m_currentSceneIndex - 1]->removeChildren();
+  }
 }

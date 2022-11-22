@@ -47,6 +47,15 @@ Camera::Camera()
 }
 
 // ------------------------------------------------------------------------------------------------
+Camera::~Camera()
+{
+  if (mainCamera == this)
+  {
+    mainCamera = nullptr;
+  }
+}
+
+// ------------------------------------------------------------------------------------------------
 void Camera::processInput(unsigned char press, float dt)
 {
   using namespace CameraDefinitions;

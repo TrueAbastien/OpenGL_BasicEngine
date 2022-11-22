@@ -39,11 +39,14 @@ void scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
 }
 
 // ------------------------------------------------------------------------------------------------
-Scene::Scene(Renderer* renderer)
+void Scene::construct(Renderer* renderer)
 {
   addChild(std::make_shared<Camera>());
-  addChild(std::make_shared<World>());
   addChild(std::make_shared<CollisionSolver>(renderer->getCollisionManager().get()));
+
+#ifdef _DEBUG
+  addChild(std::make_shared<World>());
+#endif
 }
 
 // ------------------------------------------------------------------------------------------------

@@ -8,13 +8,11 @@ set(MAIN_SOURCES
   Application.hpp
   CollisionManager.cpp
   CollisionManager.hpp
-  GJK.cpp
-  GJK.hpp
   glError.cpp
   glError.hpp
   main.cpp
-  PendulumApplication.cpp
-  PendulumApplication.hpp
+  MainApplication.cpp
+  MainApplication.hpp
   Renderer.cpp
   Renderer.hpp
   Shader.cpp
@@ -75,6 +73,11 @@ set(COMPONENT_SOURCES
 )
 list(TRANSFORM COMPONENT_SOURCES PREPEND "src/components/")
 
+set(SCENE_SOURCES
+  BowlingScene.hpp
+)
+list(TRANSFORM SCENE_SOURCES PREPEND "src/scenes/")
+
 set(VENDOR_SOURCES
   stb_image.h
 )
@@ -85,6 +88,7 @@ add_executable(${proj}
   ${MAIN_SOURCES}
   ${BUILDER_SOURCES}
   ${COMPONENT_SOURCES}
+  ${SCENE_SOURCES}
   ${VENDOR_SOURCES}
 )
 
