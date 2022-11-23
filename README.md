@@ -1,72 +1,50 @@
-OpenGL CMake Skeleton [![Build Status](https://travis-ci.org/ArthurSonzogni/OpenGL_CMake_Skeleton.svg?branch=master)](https://travis-ci.org/ArthurSonzogni/OpenGL_CMake_Skeleton)
+OpenGL Basic Engine
 =======================
 
-A ready to use C++11 CMake OpenGL skeleton using **GLFW**, **Glew** and **glm**. (use git submodules)
+A simple C++20 CMake OpenGL engine, using an older version of OpenGL and its dependencies, with a strong emphasis on Physics with a basic interaction & response of colliding OBBs and Spheres.
 
-It compiles on:
- * **WebAssembly**  (on branch webassembly. See instruction below)
- * Linux
- * Windows
- * Mac
+This project was done in the context of an Engineering School project at ENSIMAG (Grenoble, France) in the topic of Digital Mechanics. As such, parts of the Engine were rushed and may result in unwanted behaviours.
 
-It can compile for the Web with WebAssembly thanks to emscripten, as well as on
-Linux, Windows and Mac.
-
-Shader class and example Application are included.
-
-![output result](output.gif)
-
-I am open to any comments and contributions.
-
-Clone (With submodules):
-========================
+Setup
+===================
 
 ```
-git clone --recursive git@github.com:ArthurSonzogni/OpenGL_CMake_Skeleton.git
+git clone --recursive https://github.com/TrueAbastien/OpenGL_BasicEngine.git
 ```
 
-Alternatively, if you don't used the --recursive option, you can type:
-```bash
+Submodules can also be initialized with:
+```
 git submodule init
 git submodule update
 ```
 
-usage (WebAssembly) : 
----------------------
-Switch to the webassembly branch
+Application should run on:
+- Windows
+- Linux
+- Mac
+
+Simply run the `CMakeLists.txt` as such:
 ```
-git checkout webassembly
-```
-
-Install emscripten, then
-```bash
-mkdir build_emscripten
-cd build_emscripten
-CC=emcc CXX=em++ cmake ..
-make
-python -m SimpleHTTPServer 8000
-```
-
-Now, visit [http://localhost:8000](http://localhost:8000)
-
-usage (Linux) : 
----------------
-Some standard library to install:
-```bash
-sudo apt-get install cmake libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev
-
-Open the directory into a terminal
-```bash
 mkdir build
 cd build
 cmake ..
-./main
 ```
 
-usage (Windows) :
------------------
-For instance :
-* cmake-gui .
-* Configure (Choose for example Visual Studio generator)
-* Generate
-Launch the generated project in your favorite IDE and run it.
+Usage
+===================
+
+The current main application can be controlled by using a mouse and keyboard as such:
+- **ZQSD/WASD**: move the Camera center around depending on the screen orientation
+- **Mouse RB**: hold and slide to rotate the Camera
+- **Mouse Scroll**: adjust the distance from the Camera center
+
+An easy-to-use ImGui debug window should also help you pick and control the scene you want to show.
+
+Sources
+===================
+
+Most of the used code was written for the project.
+Altough, most of the algorithms followed the context of research papers on various topics.
+
+Here is the list of all used sources:
+
