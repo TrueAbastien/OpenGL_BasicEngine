@@ -35,7 +35,7 @@ Usage
 
 The current main application can be controlled by using a mouse and keyboard as such:
 - **ZQSD/WASD**: move the Camera center around depending on the screen orientation
-- **Mouse RB**: hold and slide to rotate the Camera
+- **Mouse RB**: hold and drag to rotate the Camera
 - **Mouse Scroll**: adjust the distance from the Camera center
 
 An easy-to-use ImGui debug window should also help you pick and control the scene you want to show.
@@ -46,5 +46,10 @@ Sources
 Most of the used code was written for the project.
 Altough, most of the algorithms followed the context of research papers on various topics.
 
-Here is the list of all used sources:
-
+Here is the list of all used sources and inspirations:
+- [RigidBody 3D](http://www.cs.cmu.edu/~baraff/sigcourse/notesd1.pdf)
+- [DirkGregorius - Contacts Points](http://media.steampowered.com/apps/valve/2015/DirkGregorius_Contacts.pdf)
+- [GJK/EPA](https://blog.winter.dev/2020/gjk-algorithm/)
+- [Impulse Response](https://www.cs.utah.edu/~ladislav/kavan03rigid/kavan03rigid.pdf)
+- [OBB Collisions](https://www.geometrictools.com/Documentation/DynamicCollisionDetection.pdf)
+- [Elastic Response](https://www.euclideanspace.com/physics/dynamics/collision/threed/index.htm)
