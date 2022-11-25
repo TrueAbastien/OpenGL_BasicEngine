@@ -23,6 +23,7 @@
 #include "scenes/SpinningBatScene.hpp"
 #include "scenes/DominoScene.hpp"
 #include "scenes/DynamicScene.hpp"
+#include "scenes/ParametricScene.hpp"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
@@ -52,6 +53,7 @@ MainApplication::MainApplication()
   m_scenes.push_back(std::make_unique<SpinningBatScene>());
   m_scenes.push_back(std::make_unique<DominoScene>());
   m_scenes.push_back(std::make_unique<DynamicScene>());
+  m_scenes.push_back(std::make_unique<ParametricScene>());
   // TO EXPAND
 }
 
@@ -102,7 +104,7 @@ void MainApplication::loop() {
                        return scene->getName();
                      });
 
-      if (ImGui::ListBox("Scene", &m_currentSceneIndex, names.data(), m_scenes.size() + 1, 3))
+      if (ImGui::ListBox("Scene", &m_currentSceneIndex, names.data(), m_scenes.size() + 1, 5))
       {
         selectScene(m_currentSceneIndex);
       }

@@ -13,6 +13,8 @@ set(MAIN_SOURCES
   main.cpp
   MainApplication.cpp
   MainApplication.hpp
+  ParametricSurface.cpp
+  ParametricSurface.hpp
   Renderer.cpp
   Renderer.hpp
   Shader.cpp
@@ -52,6 +54,8 @@ set(COMPONENT_SOURCES
   EmptyTransform.hpp
   Meshable.cpp
   Meshable.hpp
+  ParametricMesh.cpp
+  ParametricMesh.hpp
   Physical.cpp
   Physical.hpp
   Renderable.cpp
@@ -79,6 +83,7 @@ set(SCENE_SOURCES
   BowlsScene.hpp
   DominoScene.hpp
   DynamicScene.hpp
+  ParametricScene.hpp
   PoolScene.hpp
   SpinningBatScene.hpp
 )
