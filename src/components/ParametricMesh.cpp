@@ -8,9 +8,10 @@ ParametricMesh::ParametricMesh(const std::shared_ptr<ParametricSurface>& surface
 
   Renderable::mode = GL_LINES;
 
-  m_valCount = surface->obliviousValueCount();
+  Builder::Result mesh = surface->makeObliviousMesh();
 
-  Meshable::makeMesh(surface->makeObliviousMesh());
+  m_valCount = mesh.indexes.size();
+  Meshable::makeMesh(mesh);
 }
 
 // ------------------------------------------------------------------------------------------------

@@ -3,8 +3,8 @@
 #include "glm/gtc/constants.hpp"
 
 // ------------------------------------------------------------------------------------------------
-ParametricSurface::ParametricSurface(Func1D x_func, Func1D y_func, Func2D z_func)
-  : m_XFunc(x_func), m_YFunc(y_func), m_ZFunc(z_func)
+ParametricSurface::ParametricSurface(Func2D x_func, Func2D y_func, Func2D z_func)
+  : m_funcs({x_func, y_func, z_func})
 {
 }
 
@@ -68,34 +68,28 @@ Builder::Result ParametricSurface::makeObliviousMesh() const
 }
 
 // ------------------------------------------------------------------------------------------------
-int ParametricSurface::obliviousValueCount() const
-{
-  return 0;
-}
-
-// ------------------------------------------------------------------------------------------------
 glm::vec3 ParametricSurface::computePos(const glm::vec2& uv) const
 {
   return glm::vec3(
-    m_XFunc(uv.x),
-    m_YFunc(uv.y),
-    m_ZFunc(uv));
+    m_funcs[0](uv),
+    m_funcs[1](uv),
+    m_funcs[2](uv));
 }
 
 // ------------------------------------------------------------------------------------------------
 ParametricTube::ParametricTube(float height, float radius)
   : ParametricSurface(
-    [=](float x)
+    [=](glm::vec2 uv)
     {
-      return glm::cos(glm::pi<float>() * x) * radius;
+      return glm::cos(glm::pi<float>() * uv.x) * radius;
     },
-    [=](float y)
+    [=](glm::vec2 uv)
     {
-      return y * height;
+      return glm::sin(glm::pi<float>() * uv.x) * radius;
     },
-    [=](glm::vec2 xy)
+    [=](glm::vec2 uv)
     {
-      return glm::sin(glm::pi<float>() * xy.x) * radius;
+      return uv.y * height;
     }
   )
 {
@@ -106,11 +100,69 @@ Builder::Result ParametricTube::makeObliviousMesh() const
 {
   return makeMesh(glm::vec2(0.0, 0.0),
                   glm::vec2(2.0, 1.0),
-                  glm::ivec2(32, 2));
+                  glm::ivec2(32, 4));
 }
 
 // ------------------------------------------------------------------------------------------------
-int ParametricTube::obliviousValueCount() const
+ParametricSphere::ParametricSphere(float radius)
+  : ParametricSurface(
+    [=](glm::vec2 uv)
+    {
+      return radius
+        * glm::sin(glm::pi<float>() * uv.x)
+        * glm::cos(glm::pi<float>() * uv.y);
+    },
+    [=](glm::vec2 uv)
+    {
+      return radius
+        * glm::sin(glm::pi<float>() * uv.x)
+        * glm::sin(glm::pi<float>() * uv.y);
+    },
+    [=](glm::vec2 uv)
+    {
+      return radius
+        * glm::cos(glm::pi<float>() * uv.x);
+    }
+  )
 {
-  return 256;
+}
+
+// ------------------------------------------------------------------------------------------------
+Builder::Result ParametricSphere::makeObliviousMesh() const
+{
+  return makeMesh(glm::vec2(0.0, 0.0),
+                  glm::vec2(2.0, 1.0),
+                  glm::ivec2(32, 32));
+}
+
+// ------------------------------------------------------------------------------------------------
+ParametricTorus::ParametricTorus(float smallRadius, float bigRadius)
+  : ParametricSurface(
+    [=](glm::vec2 uv)
+    {
+      return glm::cos(glm::pi<float>() * uv.x)
+        * (bigRadius + smallRadius
+           * glm::cos(glm::pi<float>() * uv.y));
+    },
+    [=](glm::vec2 uv)
+    {
+      return smallRadius
+        * glm::sin(glm::pi<float>() * uv.y);
+    },
+    [=](glm::vec2 uv)
+    {
+      return glm::sin(glm::pi<float>() * uv.x)
+        * (bigRadius + smallRadius
+           * glm::cos(glm::pi<float>() * uv.y));
+    }
+  )
+{
+}
+
+// ------------------------------------------------------------------------------------------------
+Builder::Result ParametricTorus::makeObliviousMesh() const
+{
+  return makeMesh(glm::vec2(0.0, 0.0),
+                  glm::vec2(2.0, 2.0),
+                  glm::ivec2(32, 32));
 }

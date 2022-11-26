@@ -13,5 +13,5 @@ protected:
   void beforeUpdate(Renderer* renderer, UpdateData& data) override;
 
 private:
-  int m_valCount;
+  size_t m_valCount;
 };
